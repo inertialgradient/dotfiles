@@ -16,6 +16,10 @@
     {
       "matches": ["https://canvas.liberty.edu/courses/*/modules"],
       "js": ["canvas-parser.js"]
+    },
+    {
+      "matches": ["https://www.gradescope.com/courses/*/assignments/*/submissions/new"],
+      "js": ["gradescope-parser.js"]
     }
   ],
   "permissions": []
