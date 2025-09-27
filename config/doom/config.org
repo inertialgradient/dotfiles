@@ -1889,10 +1889,11 @@ https://orgmode.org/manual
 
 #+begin_src elisp
 (after! org
-  (setq org-priority-lowest ?F
+  (setq org-priority-lowest ?E
         org-priority-highest ?A
-        org-priority-default ?D
-        org-priority-faces nil))
+        org-priority-default ?C
+        org-priority-faces nil)
+  nil)
 #+end_src
 
 ** org-agenda
@@ -1928,12 +1929,12 @@ Save all Org buffers after any agenda action
   (interactive)
   (org-agenda nil "d"))
 
-(defun +org-agenda-skip-not-todo-or-wip-or-not-today ()
-  "Skip entries whose TODO state is not TODO/WIP, or that aren't scheduled for today."
+(defun +org-agenda-skip-done-or-canceled-or-not-today ()
+  "Skip entries that are DONE or CANCELED, or that aren't scheduled for today."
   (let* ((state     (org-get-todo-state))
          (scheduled (org-get-scheduled-time (point)))
          (is-today  (and scheduled (>= (org-today) (time-to-days scheduled)))))
-    (if (and (member state '("TODO" "WIP")) is-today)
+    (if (and (not (member state '("DONE" "CANCELED"))) is-today)
         nil
       (or (outline-next-heading) (goto-char (point-max))))))
 
@@ -1945,11 +1946,14 @@ Save all Org buffers after any agenda action
 
   (setq org-agenda-custom-commands
         `(("d" "Today (by priority)"
-           ,(mapcar (lambda (p)
-                      `(tags-todo ,(format "PRIORITY=\"%c\"" p)
-                        ((org-agenda-overriding-header ,(format "Priority %c:" p))
-                         (org-agenda-skip-function '+org-agenda-skip-not-todo-or-wip-or-not-today))))
-                    (number-sequence org-priority-highest org-priority-lowest)))))
+           ,(append
+             (mapcar (lambda (p)
+                       `(tags ,(format "PRIORITY=\"%c\"" p)
+                                   ((org-agenda-overriding-header ,(format "Priority %c:" p))
+                                    (org-agenda-skip-function '+org-agenda-skip-done-or-canceled-or-not-today))))
+                     (number-sequence org-priority-highest org-priority-lowest)))
+           ((org-agenda-skip-function
+             (lambda () (when (eq (org-agenda-count) 0) (org-agenda-skip))))))))
   nil)
 #+end_src
 
