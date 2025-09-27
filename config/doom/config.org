@@ -1953,6 +1953,12 @@ Save all Org buffers after any agenda action
   nil)
 #+end_src
 
+#+begin_src elisp
+(setq org-agenda-span 7)
+(setq org-agenda-start-day "-1d")
+(setq org-agenda-start-on-weekday 1)
+#+end_src
+
 ** bullets
 
 #+begin_src elisp
