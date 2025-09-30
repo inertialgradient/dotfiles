@@ -1,5 +1,5 @@
 const createIndex = () => {
-  const navPanel = document.querySelector("[aria-label=Close]").closest(".cds-grid-item");
+  const navPanel = document.querySelector('[aria-label="Collapse course outline"]').closest(".cds-grid-item");
   const navItems = [...navPanel.querySelectorAll(".outline-single-item-content-wrapper")].map(e => e.querySelectorAll("div")[1]);
 
   // create a map of lesson titles to sequence numbers
@@ -41,7 +41,7 @@ function generateDownloadCommand(e) {
 
   const videoDownloadsCSS = 'a[data-track-page="focused_lex_video_item"]';
   const links = Array.from(document.querySelectorAll(videoDownloadsCSS));
-  const mp4 = links.filter((e) => /mp4/i.test(e.innerText))[1] || ({ href: document.querySelector("video").src });
+  const mp4 = links.filter((e) => /mp4/i.test(e.innerText))[1]; // || ({ href: document.querySelector("video").src });
   const pdf = links.filter((e) => /pdf/i.test(e.innerText))[0];
   const vtt = links.filter((e) => /vtt/i.test(e.innerText))[0];
   const txt = links.filter((e) => /txt/i.test(e.innerText))[0];
@@ -103,6 +103,7 @@ function handleClick(e) {
     console.log(script);
     navigator.clipboard.writeText(script);
 
+    console.log("Advancing to next page...");
     // Advance to next page
     const nextButton = document.querySelector('button[aria-label="Go to next item"]');
     if (nextButton) {
@@ -111,6 +112,7 @@ function handleClick(e) {
 
     obs.disconnect(); // Stop observing after first batch of changes
   });
+
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
@@ -123,7 +125,10 @@ const toggleDownloads = () => {
 function addButtonContent() {
     toggleDownloads();
     const btnHtml = `
-      <button id="download-content" class="css-1md39p1" type="button">
+      <button
+        id="download-content"
+        class="cds-131 cds-button-disableElevation cds-button-primary css-1md39p1"
+        type="button">
         Download
       </button>`;
     const headerEl = document.querySelector('h1');
