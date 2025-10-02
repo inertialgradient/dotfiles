@@ -2173,8 +2173,8 @@ File paths for Org documents, Deft notes, and etc. Note that modifying
         org-confirm-babel-evaluate nil
         org-cycle-separator-lines 2
         org-done-keywords '("DONE" "CANCELED")
-        org-todo-keywords '((sequence "TODO(t)" "WIP(w)" "INBOX(i)" "|" "DONE(d)" "CANCELED(k)")
-                            (sequence "[ ](T)" "[-](W)" "   (I)" "|" "[X](D)" "[~](K)"))
+        org-todo-keywords '((sequence "TODO(t)" "WIP(w)" "|" "DONE(d)" "CANCELED(k)")
+                            (sequence "[ ](T)" "[-](W)"  "|" "[X](D)" "[~](K)"))
         org-edit-src-content-indentation 0
         ;; org-ellipsis " ▾"
         org-fontify-done-headline t
