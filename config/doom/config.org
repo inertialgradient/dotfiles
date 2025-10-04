@@ -1889,9 +1889,9 @@ https://orgmode.org/manual
 
 #+begin_src elisp
 (after! org
-  (setq org-priority-lowest ?E
+  (setq org-priority-lowest ?F
         org-priority-highest ?A
-        org-priority-default ?C
+        org-priority-default ?Z
         org-priority-faces nil)
   nil)
 #+end_src
