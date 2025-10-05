@@ -23,6 +23,7 @@
 (package! org-fancy-priorities)
 (package! org-projectile)
 (package! org-superstar)
+(package! org-super-agenda)
 (package! ox-gfm)
 
 ;; text editing
