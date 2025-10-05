@@ -325,7 +325,7 @@ Some general purpose super-key keybindings, with meta-variants for terminal emac
 (map! :desc "pwd vterm"     "s-'"   #'vterm-other-window
       :desc "project vterm" "s-\""  #'+vterm/toggle
       :desc "full vterm"    "s-C-'" #'(lambda () (interactive) (+vterm/here t))
-      "s-a"   #'org-agenda-today-by-priority
+      "s-a"   #'org-agenda-list
       "s-c"   #'evil-yank
       "s-f"   #'avy-goto-char-2
       "s-F"   #'avy-goto-char-timer
@@ -1937,30 +1937,40 @@ Save all Org buffers after any agenda action
     (if (and (not (member state '("DONE" "CANCELED"))) is-today)
         nil
       (or (outline-next-heading) (goto-char (point-max))))))
-
-(after! org
-  (setq org-agenda-block-separator ?⎯
-        org-agenda-start-with-log-mode t
-        org-agenda-window-setup 'only-window
-        org-agenda-restore-windows-after-quit t)
-
-  (setq org-agenda-custom-commands
-        `(("d" "Today (by priority)"
-           ,(append
-             (mapcar (lambda (p)
-                       `(tags ,(format "PRIORITY=\"%c\"" p)
-                                   ((org-agenda-overriding-header ,(format "Priority %c:" p))
-                                    (org-agenda-skip-function '+org-agenda-skip-done-or-canceled-or-not-today))))
-                     (number-sequence org-priority-highest org-priority-lowest)))
-           ((org-agenda-skip-function
-             (lambda () (when (eq (org-agenda-count) 0) (org-agenda-skip))))))))
-  nil)
 #+end_src
 
 #+begin_src elisp
-(setq org-agenda-span 7)
-(setq org-agenda-start-day "-1d")
-(setq org-agenda-start-on-weekday 1)
+(after! org-agenda
+  (setq
+   org-agenda-block-separator ?⎯
+   org-agenda-entry-types '(:deadline :scheduled :timestamp :sexp)
+   org-agenda-format-date (lambda (date) (concat "\n" (org-agenda-format-date-aligned date)))
+   org-agenda-restore-windows-after-quit t
+   org-agenda-span 7
+   org-agenda-start-day "-1d"
+   org-agenda-start-on-weekday nil
+   org-agenda-start-with-log-mode t
+   org-agenda-view-columns-initially t
+   org-agenda-window-setup 'only-window
+   org-columns-default-format "%TODO(State) %50ITEM(Task) %6Effort(Effort){:} %10CLOCKSUM(Clocked) %3PRIORITY(Pri) %TAGS(Tags)"
+   org-deadline-warning-days 7)
+  
+  (setq org-agenda-prefix-format '(
+                                   (agenda . " %i %-12:c%?-12t% s")
+                                   (todo . " %i %-12:c")
+                                   (tags . " %i %-12:c")
+                                   (search . " %i %-12:c")
+                                   ))
+  
+  (set-face-attribute 'org-agenda-date-today nil :foreground "black" :height 1.0 :weight 'bold)
+  (set-face-attribute 'org-agenda-date-weekend nil :foreground "DarkSteelBlue" :height 1.0 :weight 'bold)
+  (set-face-attribute 'org-agenda-date nil :foreground "DarkSteelBlue" :height 1.0 :weight 'bold)
+  (set-face-attribute 'org-agenda-structure nil :height 1.0 :weight 'bold)
+  (set-face-attribute 'org-agenda-done nil :foreground "gray50" :strike-through t)
+  (set-face-attribute 'org-scheduled-today nil :foreground "#556b72")
+  (set-face-attribute 'org-scheduled-previously nil :foreground "#788484")
+  (set-face-attribute 'org-scheduled nil :foreground "#788484")
+  nil)
 #+end_src
 
 ** bullets
