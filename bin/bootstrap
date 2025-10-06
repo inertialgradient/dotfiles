@@ -200,16 +200,9 @@ if machine_is?(:apple)
   setup :quick_look_viewers do
 
     cask_install :jupyter_notebook_viewer, options: :no_quarantine
-    cask_install :qlmarkdown, options: :no_quarantine
-    cask_install :qlprettypatch, options: :no_quarantine
-    cask_install :qlstephen, options: :no_quarantine
     cask_install :qlvideo, options: :no_quarantine
-    cask_install :quicklook_csv, options: :no_quarantine
-    cask_install :quicklook_json, options: :no_quarantine
-    cask_install :quicklookase, options: :no_quarantine
     cask_install :suspicious_package, options: :no_quarantine
     cask_install :syntax_highlight, options: :no_quarantine
-    cask_install :webpquicklook, options: :no_quarantine
 
     reset_quicklookd
   end
