@@ -1898,12 +1898,13 @@ https://orgmode.org/manual
 
 ** org-agenda
 
+*** Global keybinding to fuzzy-search headers
 #+begin_src elisp
 (map! "C-s-," #'consult-org-agenda)
 (map! :map org-mode-map "C-'" nil)
 #+end_src
 
-Save all Org buffers after any agenda action
+*** Save all Org buffers after any agenda action
 #+begin_src elisp
 (defun +save-org-agenda-files (&rest _)
   (interactive)
@@ -1924,53 +1925,128 @@ Save all Org buffers after any agenda action
     (advice-add cmd :after #'+org--save-agenda-buffers)))
 #+end_src
 
+***  Agenda configuration
 #+begin_src elisp
-(defun org-agenda-today-by-priority ()
-  (interactive)
-  (org-agenda nil "d"))
+(after! org-agenda
+  (setq org-agenda-block-separator ?⎯
+        org-agenda-entry-types '(:deadline :scheduled :timestamp :sexp)
+        org-agenda-format-date (lambda (date) (concat "\n" (org-agenda-format-date-aligned date)))
+        org-agenda-restore-windows-after-quit t
+        org-agenda-span 7
+        org-agenda-start-day "-1d"
+        org-agenda-start-on-weekday nil
+        org-agenda-start-with-log-mode t
+        org-agenda-view-columns-initially t
+        org-agenda-window-setup 'only-window
+        org-columns-default-format "%TODO(State) %50ITEM(Task) %6Effort(Effort){:} %10CLOCKSUM(Clocked) %3PRIORITY(Pri) %TAGS(Tags)"
+        org-deadline-warning-days 7)
+  nil)
 
-(defun +org-agenda-skip-done-or-canceled-or-not-today ()
-  "Skip entries that are DONE or CANCELED, or that aren't scheduled for today."
-  (let* ((state     (org-get-todo-state))
-         (scheduled (org-get-scheduled-time (point)))
-         (is-today  (and scheduled (>= (org-today) (time-to-days scheduled)))))
-    (if (and (not (member state '("DONE" "CANCELED"))) is-today)
-        nil
-      (or (outline-next-heading) (goto-char (point-max))))))
+(after! org-agenda
+  (setq org-agenda-prefix-format
+        '((agenda . " %i %-12:c%?-12t% s")
+          (todo . " %i %-12:c")
+          (tags . " %i %-12:c")
+          (search . " %i %-12:c")))
+  nil)
 #+end_src
+
+*** Agenda-related faces
 
 #+begin_src elisp
 (after! org-agenda
-  (setq
-   org-agenda-block-separator ?⎯
-   org-agenda-entry-types '(:deadline :scheduled :timestamp :sexp)
-   org-agenda-format-date (lambda (date) (concat "\n" (org-agenda-format-date-aligned date)))
-   org-agenda-restore-windows-after-quit t
-   org-agenda-span 7
-   org-agenda-start-day "-1d"
-   org-agenda-start-on-weekday nil
-   org-agenda-start-with-log-mode t
-   org-agenda-view-columns-initially t
-   org-agenda-window-setup 'only-window
-   org-columns-default-format "%TODO(State) %50ITEM(Task) %6Effort(Effort){:} %10CLOCKSUM(Clocked) %3PRIORITY(Pri) %TAGS(Tags)"
-   org-deadline-warning-days 7)
-  
-  (setq org-agenda-prefix-format '(
-                                   (agenda . " %i %-12:c%?-12t% s")
-                                   (todo . " %i %-12:c")
-                                   (tags . " %i %-12:c")
-                                   (search . " %i %-12:c")
-                                   ))
-  
-  (set-face-attribute 'org-agenda-date-today nil :foreground "black" :height 1.0 :weight 'bold)
-  (set-face-attribute 'org-agenda-date-weekend nil :foreground "DarkSteelBlue" :height 1.0 :weight 'bold)
-  (set-face-attribute 'org-agenda-date nil :foreground "DarkSteelBlue" :height 1.0 :weight 'bold)
-  (set-face-attribute 'org-agenda-structure nil :height 1.0 :weight 'bold)
-  (set-face-attribute 'org-agenda-done nil :foreground "gray50" :strike-through t)
-  (set-face-attribute 'org-scheduled-today nil :foreground "#556b72")
-  (set-face-attribute 'org-scheduled-previously nil :foreground "#788484")
-  (set-face-attribute 'org-scheduled nil :foreground "#788484")
-  nil)
+  ;; Define all agenda-related faces with light/dark variants
+  (defface +org-agenda-date-today
+    '((((class color) (min-colors 16) (background light))
+       (:foreground "black" :height 1.0 :weight bold))
+      (((class color) (min-colors 16) (background dark))
+       (:foreground "white" :height 1.0 :weight bold))
+      (t (:inverse-video t)))
+    "Face for today’s date in Org Agenda.")
+
+  (defface +org-agenda-date-weekend
+    '((((class color) (min-colors 16) (background light))
+       (:foreground "DarkSteelBlue" :height 1.0 :weight bold))
+      (((class color) (min-colors 16) (background dark))
+       (:foreground "LightSteelBlue" :height 1.0 :weight bold))
+      (t (:inverse-video t)))
+    "Face for weekend dates in Org Agenda.")
+
+  (defface +org-agenda-date
+    '((((class color) (min-colors 16) (background light))
+       (:foreground "DarkSteelBlue" :height 1.0 :weight bold))
+      (((class color) (min-colors 16) (background dark))
+       (:foreground "LightSteelBlue" :height 1.0 :weight bold))
+      (t (:inverse-video t)))
+    "Face for normal dates in Org Agenda.")
+
+  (defface +org-agenda-structure
+    '((((class color) (min-colors 16) (background light))
+       (:height 1.0 :weight bold))
+      (((class color) (min-colors 16) (background dark))
+       (:height 1.0 :weight bold))
+      (t (:inverse-video t)))
+    "Face for Org Agenda structure headings.")
+
+  (defface +org-agenda-done
+    '((((class color) (min-colors 16) (background light))
+       (:foreground "gray50" :strike-through t))
+      (((class color) (min-colors 16) (background dark))
+       (:foreground "gray60" :strike-through t))
+      (t (:inverse-video t)))
+    "Face for completed items in Org Agenda.")
+
+  (defface +org-scheduled-today
+    '((((class color) (min-colors 16) (background light))
+       (:foreground "#556b72"))
+      (((class color) (min-colors 16) (background dark))
+       (:foreground "#a0c0c8"))
+      (t (:inverse-video t)))
+    "Face for scheduled items due today.")
+
+  (defface +org-scheduled-previously
+    '((((class color) (min-colors 16) (background light))
+       (:foreground "#788484"))
+      (((class color) (min-colors 16) (background dark))
+       (:foreground "#909999"))
+      (t (:inverse-video t)))
+    "Face for items scheduled previously.")
+
+  (defface +org-scheduled
+    '((((class color) (min-colors 16) (background light))
+       (:foreground "#788484"))
+      (((class color) (min-colors 16) (background dark))
+       (:foreground "#909999"))
+      (t (:inverse-video t)))
+    "Face for scheduled (future) items.")
+
+  (defface +org-column
+    '((((class color) (min-colors 16) (background light))
+       (:background "#EDE8D8"))
+      (((class color) (min-colors 16) (background dark))
+       (:background "#26282E"))
+      (t (:inverse-video t)))
+    "Face for Org column view cells.")
+
+  (defface +org-column-title
+    '((((class color) (min-colors 16) (background light))
+       (:background "#EDE8D8" :weight bold))
+      (((class color) (min-colors 16) (background dark))
+       (:background "#26282E" :weight bold))
+      (t (:inverse-video t)))
+    "Face for Org column titles.")
+
+  (copy-face '+org-column 'org-column)
+  (copy-face '+org-column-title 'org-column-title)
+  (copy-face '+org-agenda-date 'org-agenda-date)
+  (copy-face '+org-agenda-date-weekend 'org-agenda-date-weekend)
+  (copy-face '+org-agenda-date-today 'org-agenda-date-today)
+  (copy-face '+org-agenda-structure 'org-agenda-structure)
+  (copy-face '+org-agenda-done 'org-agenda-done)
+  (copy-face '+org-scheduled 'org-scheduled)
+  (copy-face '+org-scheduled-today 'org-scheduled-today)
+  (copy-face '+org-scheduled-previously 'org-scheduled-previously)
+nil)
 #+end_src
 
 ** bullets
