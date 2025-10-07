@@ -1932,6 +1932,7 @@ https://orgmode.org/manual
         org-agenda-entry-types '(:deadline :scheduled :timestamp :sexp)
         org-agenda-format-date (lambda (date) (concat "\n" (org-agenda-format-date-aligned date)))
         org-agenda-restore-windows-after-quit t
+        org-agenda-skip-deadline-prewarning-if-scheduled t
         org-agenda-span 7
         org-agenda-start-day "-1d"
         org-agenda-start-on-weekday nil
