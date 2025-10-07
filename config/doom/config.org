@@ -1939,7 +1939,7 @@ https://orgmode.org/manual
         org-agenda-start-with-log-mode t
         org-agenda-view-columns-initially t
         org-agenda-window-setup 'only-window
-        org-columns-default-format "%TODO(State) %50ITEM(Task) %6Effort(Effort){:} %10CLOCKSUM(Clocked) %3PRIORITY(Pri) %TAGS(Tags)"
+        org-columns-default-format "%TODO(State) %50ITEM(Task) %6Effort(Effort){:} %10CLOCKSUM_T(Clocked){:} %3PRIORITY(Pri) %TAGS(Tags)"
         org-deadline-warning-days 7)
   nil)
 
