@@ -2779,13 +2779,6 @@ kill any open pytest compilation buffers
   (window-with-name-prefix-delete "*pytest*"))
 #+end_src
 
-** repl
-
-#+begin_src elisp
-(setq +eval-repls '((sh-mode +sh/open-repl)
-                    (python-mode +python/open-jupyter-repl :persist t :send-region python-shell-send-region :send-buffer python-shell-send-buffer)
-                    (lisp-interaction-mode +emacs-lisp/open-repl)))
-#+end_src
 
 * react & web
 
