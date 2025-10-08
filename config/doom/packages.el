@@ -43,6 +43,7 @@
 (package! dash-at-point) ;; look up in dash
 (package! exercism) ;; download exercises
 (package! xwwp :recipe (:host github :repo "canatella/xwwp")) ;; browser enhancements
+(package! py-vterm-interaction)
 
 ;; Probationary
 

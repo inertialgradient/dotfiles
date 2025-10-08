@@ -2780,6 +2780,61 @@ kill any open pytest compilation buffers
 #+end_src
 
 
+** repl: py-vterm-interaction
+
+#+begin_src elisp
+(after! python
+  ;; Enable the mode for Python buffers (handles session tracking, env propagation)
+  (add-hook 'python-mode-hook #'py-vterm-interaction-mode)
+
+  ;; Use IPython for enhanced features (e.g., magics like %run)
+  (setq! py-vterm-interaction-repl-program "ipython")
+
+  ;; Enable silent execution for Jupyter-style cells (# %%)
+  (setq! py-vterm-interaction-silent-cells t)
+
+  ;; Register vterm REPL handler for python-mode (integrates with SPC o r / +eval/open-repl)
+  (set-repl-handler! 'python-mode #'py-vterm-interaction-repl)
+
+  ;; Override universal sender to use vterm-aware sending (fixes compatibility with comint-based senders)
+  (fset '+eval/send-region-to-repl@original (symbol-function '+eval/send-region-to-repl))
+  (defun +eval/send-region-to-repl (start end)
+    "Send region to vterm REPL if available, else fallback."
+    (interactive "r")
+    (if (bound-and-true-p py-vterm-interaction-mode)
+        (py-vterm-interaction-send-region-or-current-line)
+      (+eval/send-region-to-repl@original start end)))  
+
+  ;; Optional: Override Python-specific send functions (from :lang python) to use vterm
+  ;; This ensures SPC m s s, SPC m s r, etc., work seamlessly
+  (defun +python/send-last-sexp ()
+    "Send last statement to vterm REPL."
+    (interactive)
+    (py-vterm-interaction-send-current-line))
+
+  (defun +python/send-region (start end)
+    "Send region to vterm REPL."
+    (interactive "r")
+    (py-vterm-interaction-send-region-or-current-line))
+
+  (defun +python/send-buffer ()
+    "Send buffer to vterm REPL."
+    (interactive)
+    (py-vterm-interaction-send-buffer))
+
+  ;; Add bindings for cell/function sending under python leader (SPC m)
+  (map! :localleader
+        :map python-mode-map
+        :prefix ("r" . "repl")
+        :desc "REPL"     "s" #'py-vterm-interaction-switch-to-repl-buffer
+        :desc "Cell"     "c" #'py-vterm-interaction-send-current-cell
+        :desc "Function" "f" #'py-vterm-interaction-run-current-function
+        :desc "Buffer"   "b" #'py-vterm-interaction-send-buffer
+        :desc "Region"   "r" #'py-vterm-interaction-send-region-or-current-line
+        :desc "File"     "F" #'py-vterm-interaction-run-buffer-file)
+  nil)
+#+end_src
+
 * react & web
 
 Use =rjsx-mode= for React and React-TypeScript files.
