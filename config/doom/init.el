@@ -72,8 +72,8 @@
 
  :checkers
  (syntax +childframe)
- (spell +flyspell)
- grammar
+ (spell +hunspell)
+ ;; grammar
 
  :tools
  ;;ansible

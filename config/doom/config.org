@@ -149,13 +149,6 @@ https://github.com/d12frosted/homebrew-emacs-plus/blob/master/patches/emacs-28/s
 (add-hook 'ns-system-appearance-change-functions #'+config:set-preferred-theme)
 #+end_src
 
-Tell =ispell= to shut up.
-#+begin_src elisp
-(advice-add 'ispell-lookup-words :around
-            (lambda (orig &rest args)
-              (shut-up (apply orig args))))
-#+end_src
-
 ** display: doom dashboard
 
 #+begin_src elisp

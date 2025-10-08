@@ -45,12 +45,12 @@
 (package! xwwp :recipe (:host github :repo "canatella/xwwp")) ;; browser enhancements
 (package! py-vterm-interaction)
 
-;; Probationary
-
-(package! xenops) ;; latex environment with auto-rendering of math. Needs single-file documents.
+;; disabled
 
 (disable-packages! minitest)
 (disable-packages! company-gtags)
 (disable-packages! evil-snipe)
 (disable-packages! git-gutter)
 (disable-packages! git-gutter-fringe)
+
+;; probationary
