@@ -1945,6 +1945,17 @@ https://orgmode.org/manual
   nil)
 #+end_src
 
+*** Agenda keymaps
+
+#+begin_src elisp
+(after! org-agenda
+  (map! :map org-agenda-mode-map
+        :localleader
+        (:prefix ("c" . "clock/effort")
+         :desc "Set effort" "E" #'org-agenda-set-effort))
+  nil)
+#+end_src
+
 *** Agenda-related faces
 
 #+begin_src elisp
