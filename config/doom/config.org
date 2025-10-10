@@ -1937,8 +1937,8 @@ https://orgmode.org/manual
 
 *** Global keybinding to fuzzy-search headers
 #+begin_src elisp
-(map! "C-s-," #'consult-org-agenda)
-(map! :map org-mode-map "C-'" nil)
+(map! "s-." #'consult-org-agenda
+      "C-s-." #'org-cycle-agenda-files)
 #+end_src
 
 *** Save all Org buffers after any agenda action
