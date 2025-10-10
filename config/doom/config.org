@@ -499,6 +499,18 @@ Allow remembering risky local variables.
 
 Some general-purpose functions.
 
+** +remove-from-list
+
+#+begin_src elisp
+(defun +remove-from-list (list-var &rest elements)
+  "Remove ELEMENTS from the value of LIST-VAR.
+   Usage:
+    ;; (setq my-list '(a b c d e f))
+    (remove-from-list 'my-list 'b 'd 'f)
+    ;; my-list is now '(a c e)"
+  (cl-remove-if (lambda (x) (member x elements)) list-var))
+#+end_src
+
 ** +async-shell-command-below
 
 #+begin_src elisp
