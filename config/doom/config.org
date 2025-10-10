@@ -2238,8 +2238,17 @@ File paths for Org documents, Deft notes, and etc. Note that modifying
 #+end_src
 
 #+begin_src elisp
+(defun +org-agenda-file-paths ()
+  (+remove-from-list
+   (directory-files org-directory nil "\\.org\\'")
+   "beorg-reminders.org"
+   "beorg-calendar.org"
+   "beorg-customize-init.org"))
+#+end_src
+
+#+begin_src elisp
 (after! org
-  (setq org-agenda-files (list org-directory)
+  (setq org-agenda-files (+org-agenda-file-paths)
         org-archive-location (concat org-directory "/archive/%s::")
         org-default-notes-file (concat org-directory "/inbox.org")
         ;; the following are relative to `org-directory', unless absolute.
