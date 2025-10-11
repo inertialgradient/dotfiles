@@ -2303,15 +2303,15 @@ Open capture modal with C-SPC
 
           ("b" "Blog Entries")
           ("bp" "Project" entry (file+headline "blog/projects.org" "Projects")
-           (function org-hugo-new-project-capture-template) :empty-lines 1 :prepend t)
+           (function +org-hugo-new-project-capture-template) :empty-lines 1 :prepend t :jump-to-captured t :after-finalize #'+org-capture-save-target-buffer-h)
           ("bc" "Commonplace" entry (file+headline "blog/commonplaces.org" "Commonplaces")
-           (function org-hugo-new-commonplace-capture-template) :empty-lines 1 :prepend t)
+           (function +org-hugo-new-commonplace-capture-template) :empty-lines 1 :prepend t :after-finalize #'+org-capture-save-target-buffer-h)
           ("bm" "Marginalia" entry (file+headline "blog/marginalia.org" "Marginalia")
-           (function org-hugo-new-marginalia-capture-template) :empty-lines 1 :prepend t)
+           (function +org-hugo-new-marginalia-capture-template) :empty-lines 1 :prepend t :after-finalize #'+org-capture-save-target-buffer-h)
           ("bn" "Notes" entry (file+headline "blog/notebook.org" "Notes")
-           (function org-hugo-new-project-capture-template) :empty-lines 1 :prepend t)
-          ("bs" "Article Summary" entry (file+headline "blog/notebook.org" "Notes")
-           (function org-hugo-new-summary-capture-template) :empty-lines 1 :prepend t)
+           (function +org-hugo-new-project-capture-template) :empty-lines 1 :prepend t :jump-to-captured t :after-finalize #'+org-capture-save-target-buffer-h)
+          ("bs" "Summary" entry (file+headline "blog/notebook.org" "Notes")
+           (function +org-hugo-new-summary-capture-template) :empty-lines 1 :prepend t :jump-to-captured t :after-finalize #'+org-capture-save-target-buffer-h)
 
           ;; Will use {project-root}/{todo,notes,changelog}.org, unless a
           ;; {todo,notes,changelog}.org file is found in a parent directory.
@@ -2557,9 +2557,19 @@ a communication channel."
     (format-time-string "%z"))))
 #+end_src
 
+**** save-file hook
+#+begin_src elisp
+(defun +org-capture-save-target-buffer-h ()
+  "Save the target buffer after an Org capture is finalized.
+Intended for use as :after-finalize in org-capture-templates, or
+as a global hook via `org-capture-after-finalize-hook'."
+  (when (and (buffer-file-name)
+             (derived-mode-p 'org-mode))
+    (save-buffer)))
+#+end_src
 **** projects
 #+begin_src elisp
-(defun org-hugo-new-project-capture-template ()
+(defun +org-hugo-new-project-capture-template ()
   "Return `org-capture' template string for new Hugo blog post.
 See `org-capture-templates' for more information."
   (save-match-data
@@ -2581,7 +2591,7 @@ See `org-capture-templates' for more information."
 
 **** article summaries
 #+begin_src elisp
-(defun org-hugo-new-summary-capture-template ()
+(defun +org-hugo-new-summary-capture-template ()
   "Return `org-capture' template string for new Hugo blog post.
 See `org-capture-templates' for more information."
   (save-match-data
@@ -2612,7 +2622,7 @@ See `org-capture-templates' for more information."
 **** marginalia
 
 #+begin_src elisp
-(defun org-hugo-new-marginalia-capture-template ()
+(defun +org-hugo-new-marginalia-capture-template ()
   "Return `org-capture' template string for new Hugo marginalia post.
 See `org-capture-templates' for more information."
   (save-match-data
@@ -2633,7 +2643,7 @@ See `org-capture-templates' for more information."
 **** commonplaces
 
 #+begin_src elisp
-(defun org-hugo-new-commonplace-capture-template ()
+(defun +org-hugo-new-commonplace-capture-template ()
   "Return `org-capture' template string for new Hugo commonplace post.
 See `org-capture-templates' for more information."
   (save-match-data
