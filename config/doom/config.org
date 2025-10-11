@@ -347,52 +347,28 @@ Use comma for the local leader key.
 #+end_src
 
 ** super keys
-
 #+begin_src elisp
-(defun +new-emacs-instance ()
+(defun +vterm-here-in-cwd ()
+  "Open vterm in cwd instead of at project root."
   (interactive)
-  (start-process
-   "emacs" nil
-   "/bin/zsh" "-c" "open ~/.dotfiles/scripts/Emacs.app"))
+  (+vterm/here t))
+
+(defun +delete-frame-force ()
+  "Delete the current frame, without asking for confirmation."
+  (interactive)
+  (delete-frame nil t))
 #+end_src
 
-Some general purpose super-key keybindings, with meta-variants for terminal emacs.
-
+*** GUI Emacs
+Some general purpose super-key keybindings.
 #+begin_src elisp
-(map! :desc "pwd vterm"     "s-'"   #'vterm-other-window
-      :desc "project vterm" "s-\""  #'+vterm/toggle
-      :desc "full vterm"    "s-C-'" #'(lambda () (interactive) (+vterm/here t))
-      "s-c"   #'clipboard-kill-ring-save
-      "s-x"   #'clipboard-kill-region 
-      "s-v"   #'clipboard-yank
-      "s-a"   #'org-agenda-list
-      "s-f"   #'avy-goto-char-2
-      "s-F"   #'avy-goto-char-timer
-      "s-k"   #'bury-buffer
-      "s-K"   #'kill-current-buffer
-      "s-s"   #'save-buffer
-      "s-w"   #'+workspace/close-window-or-workspace
-      "s-W"   #'+workspace/kill
-      "s-C-w" #'(lambda () (interactive) (delete-frame nil t))
-      "s-q"   #'save-buffers-kill-terminal
-      "s-,"   #'+open-dotfiles
-      "<s-escape>"   #'evil-escape)
-
-(unless (display-graphic-p)
-  (setq mac-right-option-modifier 'meta)
-  (setq mac-option-modifier 'meta)
-  (map! :desc "pwd vterm"     "M-'"   #'vterm-other-window
-        :desc "project vterm" "M-\""  #'+vterm/toggle
-        :desc "full vterm"    "M-C-'" #'(lambda () (interactive) (+vterm/here t))
-        "M-K"   #'kill-current-buffer
-        "M-k"   #'bury-buffer
-        "M-f"   #'avy-goto-char-2
-        "M-F"   #'avy-goto-char-timer
-        "M-n"   #'org-capture
-        "M-N"   #'org-projectile-project-todo-completing-read
-        "<M-escape>"   #'evil-escape))
+;; FIXME: no-ops?
+(if (display-graphic-p)
+    (map! "<s-escape>" #'evil-escape)
+  (map! "<M-escape>" #'evil-escape))
 #+end_src
 
+Use =s-`= to cycle between frames.
 #+begin_src elisp
 (defun +config:keybindings:overrides ()
   (define-key help-quick-use-map (kbd "s-`") nil)
@@ -400,6 +376,47 @@ Some general purpose super-key keybindings, with meta-variants for terminal emac
 (add-hook 'emacs-startup-hook #'+config:keybindings:overrides)
 #+end_src
 
+#+begin_src elisp
+(map!
+ "s-,"   #'+open-dotfiles
+ "s-C-w" #'+delete-frame-force
+ "s-F"   #'avy-goto-char-timer
+ "s-K"   #'kill-current-buffer
+ "s-W"   #'+workspace/kill
+ "s-a"   #'org-agenda-list
+ "s-f"   #'avy-goto-char-2
+ "s-k"   #'bury-buffer
+ "s-q"   #'save-buffers-kill-terminal
+ "s-s"   #'save-buffer
+ "s-w"   #'+workspace/close-window-or-workspace)
+#+end_src
+
+*** Terminal variants
+
+#+begin_src elisp
+(unless (display-graphic-p)
+  (setq mac-right-option-modifier 'meta)
+  (setq mac-option-modifier 'meta)
+
+  (map!
+   "M-F" #'avy-goto-char-timer
+   "M-K" #'kill-current-buffer
+   "M-N" #'org-projectile-project-todo-completing-read
+   "M-f" #'avy-goto-char-2
+   "M-k" #'bury-buffer
+   "M-n" #'org-capture))
+#+end_src
+
+*** vterm
+#+begin_src elisp
+(if (display-graphic-p)
+    (map! "s-\""  #'+vterm/toggle        ;; in vterm drawer at project root
+          "s-'"    #'vterm-other-window  ;; in vterm drawer
+          "s-C-'"  #'+vterm-here-in-cwd) ;; take over current buffer
+  (map! "M-S-\"" #'+vterm/toggle
+        "M-'"   #'vterm-other-window
+        "M-C-'" #'+vterm-here-in-cwd))
+#+end_src
 
 *** cut/copy/paste
 
@@ -417,7 +434,7 @@ Some general purpose super-key keybindings, with meta-variants for terminal emac
   "Cut region to both the Emacs kill ring and system clipboard."
   (interactive "r\np")
   (kill-region beg end region)
-  (let ((text (car kill-ring))) 
+  (let ((text (car kill-ring)))
     (when text
       (with-temp-buffer
         (insert text)
@@ -3001,7 +3018,7 @@ kill any open pytest compilation buffers
     (interactive "r")
     (if (bound-and-true-p py-vterm-interaction-mode)
         (py-vterm-interaction-send-region-or-current-line)
-      (+eval/send-region-to-repl@original start end)))  
+      (+eval/send-region-to-repl@original start end)))
 
   ;; Optional: Override Python-specific send functions (from :lang python) to use vterm
   ;; This ensures SPC m s s, SPC m s r, etc., work seamlessly
