@@ -2251,7 +2251,7 @@ File paths for Org documents, Deft notes, and etc. Note that modifying
 #+end_src
 
 #+begin_src elisp
-(defun +org-agenda-file-paths ()
+(defun +org-agenda-file-names ()
   (+remove-from-list
    (directory-files org-directory nil "\\.org\\'")
    "beorg-reminders.org"
@@ -2261,15 +2261,16 @@ File paths for Org documents, Deft notes, and etc. Note that modifying
 
 #+begin_src elisp
 (after! org
-  (setq org-agenda-files (+org-agenda-file-paths)
-        org-archive-location (concat org-directory "/archive/%s::")
-        org-default-notes-file (concat org-directory "/inbox.org")
-        ;; the following are relative to `org-directory', unless absolute.
+  (setq org-agenda-files (+org-agenda-file-names)
+        +org-capture-projects-file "projects.org"
         +org-capture-changelog-file "changelog.org"
+        +org-capture-notes-file "notes.org"
+        +org-capture-links-file "links.org"
+        +org-capture-todo-file "todo.org"
         +org-capture-journal-file (format "%s/journal.org.gpg" org-directory)
-        +org-capture-notes-file "inbox.org"
-        +org-capture-projects-file "inbox.org"
-        +org-capture-todo-file "inbox.org"))
+        org-archive-location (concat org-directory "/archive/%s::")
+        org-default-notes-file (concat org-directory "/inbox.org"))
+  nil)
 #+end_src
 
 ** capture templates
@@ -2280,6 +2281,7 @@ Open capture modal with C-SPC
 (map! "C-SPC" #'org-capture) ;; #'+org-capture/open-frame)
 #+end_src
 
+#+begin_src elisp
 (after! org
  (setq +org-capture-frame-parameters
        '((name . "org-capture")
@@ -2290,53 +2292,122 @@ Open capture modal with C-SPC
 #+end_src
 
 #+begin_src elisp
-(after! org
-  (setq org-capture-templates
-        '(("t" "Personal todo" entry (file+headline +org-capture-todo-file "Inbox")
-           "* [ ] %?\n%i\n%a" :prepend t)
-          ("d" "Dev environment todo" entry (file+headline +org-capture-todo-file "Development Environment")
-           "* [ ] %?\n%i\n%a" :prepend t)
-          ("n" "Personal notes" entry (file+headline +org-capture-notes-file "Inbox")
-           "* %u %?\n%i\n%a" :prepend t)
-          ("j" "Journal" entry (file+olp+datetree +org-capture-journal-file)
-           "* %U %?\n%i\n%a" :prepend t)
+(defun +org-capture--get-clipboard-url ()
+  "Return a URL from the system clipboard if it looks like one, else prompt the user."
+  (let* ((clip (string-trim (shell-command-to-string "pbpaste")))
+         (url (if (string-match-p "^https?://" clip)
+                  clip
+                (read-string "URL: "))))
+    url))
 
-          ("b" "Blog Entries")
-          ("bp" "Project" entry (file+headline "blog/projects.org" "Projects")
-           (function +org-hugo-new-project-capture-template) :empty-lines 1 :prepend t :jump-to-captured t :after-finalize #'+org-capture-save-target-buffer-h)
-          ("bc" "Commonplace" entry (file+headline "blog/commonplaces.org" "Commonplaces")
-           (function +org-hugo-new-commonplace-capture-template) :empty-lines 1 :prepend t :after-finalize #'+org-capture-save-target-buffer-h)
-          ("bm" "Marginalia" entry (file+headline "blog/marginalia.org" "Marginalia")
-           (function +org-hugo-new-marginalia-capture-template) :empty-lines 1 :prepend t :after-finalize #'+org-capture-save-target-buffer-h)
-          ("bn" "Notes" entry (file+headline "blog/notebook.org" "Notes")
-           (function +org-hugo-new-project-capture-template) :empty-lines 1 :prepend t :jump-to-captured t :after-finalize #'+org-capture-save-target-buffer-h)
-          ("bs" "Summary" entry (file+headline "blog/notebook.org" "Notes")
-           (function +org-hugo-new-summary-capture-template) :empty-lines 1 :prepend t :jump-to-captured t :after-finalize #'+org-capture-save-target-buffer-h)
+(defun +org-capture--make-link-entry ()
+  "Return an Org capture entry string for a clipboard or prompted URL."
+  (let ((url (+org-capture--get-clipboard-url))
+        (title (read-string "Link title: ")))
+    (format "** [[%s][%s]]\n%s"
+            url title (format-time-string "[%Y-%m-%d %a]"))))
+#+end_src
+
+#+begin_src elisp
+(after! org
+  (setq +org-capture-projects-central-file-path (format "%s/%s" org-directory +org-capture-projects-file))
+  (setq +org-capture-links-file-path (format "%s/%s" org-directory +org-capture-links-file))
+  (setq org-capture-templates
+        '(("t" "Todo" entry
+           (file+headline +org-capture-todo-file "Inbox")
+           "* TODO %?\n%i\n%a"
+           :prepend t)
+          ("d" "Yak Shave" entry
+           (file+olp +org-capture-projects-central-file-path ".dotfiles" "Tasks")
+           "* TODO %?\n%i\n%a"
+           :prepend t)
+          ("n" "Notes" entry
+           (file+headline +org-capture-notes-file "Inbox")
+           "* %?\n%i\n%a"
+           :prepend t)
+          ("j" "Journal" entry
+           (file+olp+datetree +org-capture-journal-file)
+           "* %U %?\n%i\n%a"
+           :prepend t)
+          ("l" "Link" entry
+           (file+headline +org-capture-links-file-path "Inbox")
+           #'+org-capture--make-link-entry
+           :prepend t
+           :immediate-finish t)
+
+          ("b" "Blog")
+          ("bp" "Project" entry
+           (file+headline "blog/projects.org" "Projects")
+           (function +org-hugo-new-project-capture-template)
+           :prepend t
+           :jump-to-captured t
+           :after-finalize #'+org-capture-save-target-buffer-h)
+          ("bc" "Commonplace" entry
+           (file+headline "blog/commonplaces.org" "Commonplaces")
+           (function +org-hugo-new-commonplace-capture-template)
+           :prepend t
+           :after-finalize #'+org-capture-save-target-buffer-h)
+          ("bm" "Marginalia" entry
+           (file+headline "blog/marginalia.org" "Marginalia")
+           (function +org-hugo-new-marginalia-capture-template)
+           :prepend t
+           :after-finalize #'+org-capture-save-target-buffer-h)
+          ("bn" "Notes" entry
+           (file+headline "blog/notebook.org" "Notes")
+           (function +org-hugo-new-project-capture-template)
+           :prepend t
+           :jump-to-captured t
+           :after-finalize #'+org-capture-save-target-buffer-h)
+          ("bs" "Summary" entry
+           (file+headline "blog/notebook.org" "Notes")
+           (function +org-hugo-new-summary-capture-template)
+           :prepend t
+           :jump-to-captured t
+           :after-finalize #'+org-capture-save-target-buffer-h)
 
           ;; Will use {project-root}/{todo,notes,changelog}.org, unless a
           ;; {todo,notes,changelog}.org file is found in a parent directory.
           ;; Uses the basename from `+org-capture-todo-file',
           ;; `+org-capture-changelog-file' and `+org-capture-notes-file'.
-          ("p" "Templates for projects")
-          ("pt" "Project-local todo" entry (file+headline +org-capture-project-todo-file "Inbox")
-           "* TODO %?\n%i\n%a" :prepend t)
-          ("pn" "Project-local notes" entry (file+headline +org-capture-project-notes-file "Inbox")
-           "* %U %?\n%i\n%a" :prepend t)
-          ("pc" "Project-local changelog" entry (file+headline +org-capture-project-changelog-file "Unreleased")
-           "* %U %?\n%i\n%a" :prepend t)
+          ("p" "Project (local)")
+          ("pt" "Project-local todo" entry
+           (file+headline +org-capture-project-todo-file "Inbox")
+           "* TODO %?\n%i\n%a"
+           :prepend t)
+          ("pn" "Project-local notes" entry
+           (file+headline +org-capture-project-notes-file "Inbox")
+           "* %?\n%i\n%a"
+           :prepend t)
+          ("pc" "Project-local changelog" entry
+           (file+headline +org-capture-project-changelog-file "Unreleased")
+           "* %u %?\n%i\n%a"
+           :prepend t)
 
           ;; Will use {org-directory}/{+org-capture-projects-file} and store
           ;; these under {ProjectName}/{Tasks,Notes,Changelog} headings. They
           ;; support `:parents' to specify what headings to put them under, e.g.
           ;; :parents ("Projects")
-          ("o" "Centralized templates for projects")
-          ("ot" "Project todo" entry (function +org-capture-central-project-todo-file)
-           "* TODO %?\n %i\n %a" :heading "Tasks" :prepend nil)
-          ("on" "Project notes" entry (function +org-capture-central-project-notes-file)
-           "* %U %?\n %i\n %a" :heading "Notes" :prepend t)
-          ("oc" "Project changelog" entry (function +org-capture-central-project-changelog-file)
-           "* %U %?\n %i\n %a" :heading "Changelog" :prepend t))))
+          ("P" "Project (centralized)")
+          ("Pt" "todo" entry
+           (function +org-capture-central-project-todo-file)
+           "* TODO %?\n %i\n %a"
+           :heading "Tasks"
+           :prepend t)
+          ("Pn" "notes" entry
+           (function +org-capture-central-project-notes-file)
+           "* %?\n %i\n %a"
+           :heading "Notes"
+           :prepend t)
+          ("Pc" "changelog" entry
+           (function +org-capture-central-project-changelog-file)
+           "* %u %?\n %i\n %a"
+           :heading "Changelog"
+           :prepend t)))
+  )
 #+end_src
+
+#+RESULTS:
+| t | Todo | entry | (file+headline +org-capture-todo-file Inbox) | * TODO %? |
 
 ** variables
 
