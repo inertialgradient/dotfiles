@@ -2248,8 +2248,7 @@ File paths for Org documents, Deft notes, and etc. Note that modifying
 ~org-directory~ must happen /before/ =org= has loaded.
 
 #+begin_src elisp
-(setq org-directory (getenv "ORG_HOME")
-      deft-directory (format "%s/notes" org-directory))
+(setq org-directory (getenv "ORG_HOME"))
 #+end_src
 
 #+begin_src elisp
