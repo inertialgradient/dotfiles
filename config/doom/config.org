@@ -15,9 +15,9 @@ See [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/emacs-lis
 
 ** select-enable-clipboard
 
- TODO: Provide a command for this and set to nil
 #+begin_src elisp
-(setq select-enable-clipboard t)
+(setq select-enable-clipboard nil
+      x-select-enable-clipboard nil)
 #+end_src
 
 ** which-key
@@ -362,14 +362,15 @@ Some general purpose super-key keybindings, with meta-variants for terminal emac
 (map! :desc "pwd vterm"     "s-'"   #'vterm-other-window
       :desc "project vterm" "s-\""  #'+vterm/toggle
       :desc "full vterm"    "s-C-'" #'(lambda () (interactive) (+vterm/here t))
+      "s-c"   #'clipboard-kill-ring-save
+      "s-x"   #'clipboard-kill-region 
+      "s-v"   #'clipboard-yank
       "s-a"   #'org-agenda-list
-      "s-c"   #'evil-yank
       "s-f"   #'avy-goto-char-2
       "s-F"   #'avy-goto-char-timer
       "s-k"   #'bury-buffer
       "s-K"   #'kill-current-buffer
       "s-s"   #'save-buffer
-      "s-v"   #'evil-paste-after
       "s-w"   #'+workspace/close-window-or-workspace
       "s-W"   #'+workspace/kill
       "s-C-w" #'(lambda () (interactive) (delete-frame nil t))
@@ -399,9 +400,40 @@ Some general purpose super-key keybindings, with meta-variants for terminal emac
 (add-hook 'emacs-startup-hook #'+config:keybindings:overrides)
 #+end_src
 
+
+*** cut/copy/paste
+
+#+begin_src elisp
+(defun +kill-ring-save-to-both (beg end &optional region)
+  "Copy region to both the Emacs kill ring and system clipboard."
+  (interactive "r\np")
+  (kill-ring-save beg end region)
+  (let ((text (buffer-substring-no-properties beg end)))
+    (with-temp-buffer
+      (insert text)
+      (call-process-region (point-min) (point-max) "pbcopy"))))
+
+(defun +kill-region-to-both (beg end &optional region)
+  "Cut region to both the Emacs kill ring and system clipboard."
+  (interactive "r\np")
+  (kill-region beg end region)
+  (let ((text (car kill-ring))) 
+    (when text
+      (with-temp-buffer
+        (insert text)
+        (call-process-region (point-min) (point-max) "pbcopy")))))
+
+(map! :nvi "s-x" #'+kill-region-to-both
+      :nvi "s-c" #'+kill-ring-save-to-both
+      :nvi "s-v" #'clipboard-yank)
+#+end_src
+
+*** make / run
+
 #+begin_src elisp
 (map! :ni "s-<return>" #'+make/run)
 #+end_src
+
 
 ** identity
 
@@ -2403,11 +2435,8 @@ Open capture modal with C-SPC
            "* %u %?\n %i\n %a"
            :heading "Changelog"
            :prepend t)))
-  )
+  nil)
 #+end_src
-
-#+RESULTS:
-| t | Todo | entry | (file+headline +org-capture-todo-file Inbox) | * TODO %? |
 
 ** variables
 
