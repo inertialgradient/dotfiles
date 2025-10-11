@@ -1974,7 +1974,7 @@ https://orgmode.org/manual
     (advice-add cmd :after #'+org--save-agenda-buffers)))
 #+end_src
 
-***  Agenda configuration
+*** Agenda configuration
 #+begin_src elisp
 (after! org-agenda
   (setq org-agenda-block-separator ?⎯
@@ -2108,6 +2108,21 @@ https://orgmode.org/manual
   (copy-face '+org-scheduled-today 'org-scheduled-today)
   (copy-face '+org-scheduled-previously 'org-scheduled-previously)
 nil)
+#+end_src
+
+*** Agenda custom command: completed this week
+
+#+begin_src elisp
+(after! org-agenda
+  (add-to-list 'org-agenda-custom-commands
+               '("W" "Completed tasks in past week"
+                 ((agenda ""
+                          ((org-agenda-span 7)
+                           (org-agenda-start-day "-7d")
+                           (org-agenda-log-mode-items '(closed clock state))
+                           (org-agenda-skip-function
+                            '(org-agenda-skip-entry-if 'notregexp "CLOSED:")))))))
+  nil)
 #+end_src
 
 ** bullets
