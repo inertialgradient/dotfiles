@@ -440,9 +440,10 @@ Use =s-`= to cycle between frames.
         (insert text)
         (call-process-region (point-min) (point-max) "pbcopy")))))
 
-(map! :nvi "s-x" #'+kill-region-to-both
-      :nvi "s-c" #'+kill-ring-save-to-both
-      :nvi "s-v" #'clipboard-yank)
+(map! :nvie
+      "s-x" #'+kill-region-to-both
+      "s-c" #'+kill-ring-save-to-both
+      "s-v" #'clipboard-yank)
 #+end_src
 
 *** make / run
