@@ -368,7 +368,6 @@ Some general purpose super-key keybindings, with meta-variants for terminal emac
       "s-F"   #'avy-goto-char-timer
       "s-k"   #'bury-buffer
       "s-K"   #'kill-current-buffer
-      "s-n"   #'+org-capture/open-frame
       "s-s"   #'save-buffer
       "s-v"   #'evil-paste-after
       "s-w"   #'+workspace/close-window-or-workspace
@@ -2275,13 +2274,19 @@ File paths for Org documents, Deft notes, and etc. Note that modifying
 
 ** capture templates
 
+Open capture modal with C-SPC
+
 #+begin_src elisp
+(map! "C-SPC" #'org-capture) ;; #'+org-capture/open-frame)
+#+end_src
+
 (after! org
  (setq +org-capture-frame-parameters
        '((name . "org-capture")
          (fullscreen . fullboth)
          (transient . t)
-         (menu-bar-lines . 1))))
+         (menu-bar-lines . 1)))
+ nil)
 #+end_src
 
 #+begin_src elisp
