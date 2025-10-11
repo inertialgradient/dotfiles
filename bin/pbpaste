@@ -5,6 +5,6 @@ case "${MACHINE}" in
     xclip -selection clipboard -out
   ;;
   apple|intel-mac)
-    /usr/bin/pbcopy
+    /usr/bin/pbpaste
   ;;
 esac
