@@ -2190,6 +2190,7 @@ nil)
 #+end_src
 
 ** commands
+*** Insert headings
 
 #+begin_src elisp
 (defun org-insert-heading-above ()
@@ -2218,6 +2219,18 @@ nil)
     (evil-insert 1)))
 #+end_src
 
+*** update all clocktables in dashboard
+
+#+begin_src elisp
+(defun +org-update-dashboard ()
+  "Rebuild all clocktables in the dashboard file."
+  (interactive)
+  (with-current-buffer (find-file-noselect +org-agenda-dashboard-file)
+    (org-update-all-dblocks)
+    (save-buffer)))
+#+end_src
+
+*** schedule items on successive days
 #+begin_src elisp
 (defun org-schedule-subtree-items-on-successive-days (start-date target-level)
   "Set scheduled dates for all headings of the TARGET-LEVEL in subtree, starting from START-DATE."
@@ -2312,6 +2325,7 @@ File paths for Org documents, Deft notes, and etc. Note that modifying
 #+begin_src elisp
 (after! org
   (setq org-agenda-files (+org-agenda-file-names)
+        +org-agenda-dashboard-file (concat org-directory "/dashboard.org")
         +org-capture-projects-file "projects.org"
         +org-capture-changelog-file "changelog.org"
         +org-capture-notes-file "notes.org"
