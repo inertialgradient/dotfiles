@@ -2035,18 +2035,19 @@ https://orgmode.org/manual
         org-agenda-start-day "-1d"
         org-agenda-start-on-weekday nil
         org-agenda-start-with-log-mode t
-        org-agenda-view-columns-initially t
+        org-agenda-use-time-grid nil
+        org-agenda-view-columns-initially nil
         org-agenda-window-setup 'only-window
-        org-columns-default-format "%TODO(State) %50ITEM(Task) %6Effort(Effort){:} %10CLOCKSUM_T(Clocked){:} %3PRIORITY(Pri) %TAGS(Tags)"
+        org-columns-default-format "%TODO(State) %3PRIORITY(Pri) %6Effort(Effort){:} %50ITEM(Task) %TAGS(Tags)"
         org-deadline-warning-days 7)
   nil)
 
 (after! org-agenda
   (setq org-agenda-prefix-format
-        '((agenda . " %i %-12:c%?-12t% s")
-          (todo . " %i %-12:c")
-          (tags . " %i %-12:c")
-          (search . " %i %-12:c")))
+        '((agenda . "  %s %-12t[%5e] ")
+          (todo   . "  %-12:c")
+          (tags   . "  %-12:c")
+          (search . "  %-12:c")))
   nil)
 #+end_src
 
