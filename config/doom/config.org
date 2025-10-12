@@ -2002,6 +2002,13 @@ https://orgmode.org/manual
       "C-s-." #'org-cycle-agenda-files)
 #+end_src
 
+*** org-agenda keymaps
+#+begin_src elisp
+(map! :map evil-org-agenda-mode-map
+      :localleader
+      "C" #'org-agenda-columns)
+#+end_src
+
 *** Save all Org buffers after any agenda action
 #+begin_src elisp
 (defun +save-org-agenda-files (&rest _)
