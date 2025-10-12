@@ -2036,6 +2036,7 @@ https://orgmode.org/manual
         org-agenda-entry-types '(:deadline :scheduled :timestamp :sexp)
         org-agenda-format-date (lambda (date) (concat "\n" (org-agenda-format-date-aligned date)))
         org-agenda-restore-windows-after-quit t
+        org-agenda-remove-tags 'prefix
         org-agenda-skip-deadline-prewarning-if-scheduled t
         org-agenda-span 7
         org-agenda-start-day "-1d"
@@ -2050,7 +2051,7 @@ https://orgmode.org/manual
 
 (after! org-agenda
   (setq org-agenda-prefix-format
-        '((agenda . "  %s %-12t[%5e] ")
+        '((agenda . "  %s%-12t[%5e]%10T ")
           (todo   . "  %-12:c")
           (tags   . "  %-12:c")
           (search . "  %-12:c")))
