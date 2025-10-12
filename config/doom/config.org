@@ -2037,7 +2037,9 @@ https://orgmode.org/manual
         org-agenda-format-date (lambda (date) (concat "\n" (org-agenda-format-date-aligned date)))
         org-agenda-restore-windows-after-quit t
         org-agenda-remove-tags 'prefix
+        org-agenda-skip-deadline-if-done t
         org-agenda-skip-deadline-prewarning-if-scheduled t
+        org-agenda-skip-scheduled-if-done t
         org-agenda-span 7
         org-agenda-start-day "-1d"
         org-agenda-start-on-weekday nil
