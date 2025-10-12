@@ -1,7 +1,7 @@
 #+title: Emacs Config
 #+author: Jacob Romer
 #+property: header-args :elisp :tangle yes :comments link
-#+startup: org-startup-folded: fold
+#+startup: show2levels
 
 * +general
 
@@ -451,7 +451,6 @@ Use =s-`= to cycle between frames.
 #+begin_src elisp
 (map! :ni "s-<return>" #'+make/run)
 #+end_src
-
 
 ** identity
 
@@ -3016,7 +3015,6 @@ kill any open pytest compilation buffers
   (interactive)
   (window-with-name-prefix-delete "*pytest*"))
 #+end_src
-
 
 ** repl: py-vterm-interaction
 
