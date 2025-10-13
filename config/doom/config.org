@@ -1644,7 +1644,6 @@ Use xwidgets to browse online search results online. (disabled)
 (setq +lookup-open-url-fn #'+lookup-xwidget-webkit-open-url-fn)
 #+end_src
 
-
 ** dash-at-point
 
 https://github.com/stanaka/dash-at-point
@@ -1746,9 +1745,9 @@ Remove the git flow hook added by doom.
   (interactive)
   (shell-command-to-string (format "git add --all && git-clock-out")))
 
-(map! :map prog-mode-map
-      "s-c" #'git-clock-in
-      "s-C" #'git-clock-out)
+;; (map! :map prog-mode-map
+;;       "s-c" #'git-clock-in
+;;       "s-C" #'git-clock-out)
 #+end_src
 
 * magit: tagged commits
