@@ -2020,12 +2020,19 @@ https://orgmode.org/manual
   (org-save-all-org-buffers))
 
 (after! org-agenda
-  (dolist (cmd '(org-agenda-todo
+  (dolist (cmd '(
+                 org-agenda-clock-in
+                 org-agenda-clock-out
+                 org-agenda-deadline
+                 org-agenda-do-date-earlier
+                 org-agenda-do-date-later
                  org-agenda-priority
                  org-agenda-schedule
-                 org-agenda-deadline
+                 org-agenda-set-effort
+                 org-agenda-set-property
                  org-agenda-set-tags
-                 org-agenda-set-property))
+                 org-agenda-todo
+                 ))
     (advice-add cmd :after #'+org--save-agenda-buffers)))
 #+end_src
 
