@@ -384,6 +384,7 @@ Use =s-`= to cycle between frames.
  "s-K"   #'kill-current-buffer
  "s-W"   #'+workspace/kill
  "s-a"   #'org-agenda-list
+ "s-A"   #'do/org-agenda-dashboard
  "s-f"   #'avy-goto-char-2
  "s-k"   #'bury-buffer
  "s-q"   #'save-buffers-kill-terminal
@@ -2244,6 +2245,25 @@ nil)
   (with-current-buffer (find-file-noselect +org-agenda-dashboard-file)
     (org-update-all-dblocks)
     (save-buffer)))
+#+end_src
+
+*** do/org-agenda-dashboard
+#+begin_src elisp
+(defun do/org-agenda-dashboard ()
+  (interactive)
+  (+org-update-dashboard)
+  (let* ((buf-name "*Org Dashboard*")
+         (buf (get-buffer buf-name)))
+    (if buf
+        (switch-to-buffer buf)
+      (setq buf (get-buffer-create buf-name))
+      (with-current-buffer buf
+        (erase-buffer)
+        (insert-file-contents +org-agenda-dashboard-file)
+        (read-only-mode 1)
+        (org-mode)
+        (evil-local-set-key 'normal (kbd "q") #'bury-buffer))
+      (switch-to-buffer buf))))
 #+end_src
 
 *** schedule items on successive days
