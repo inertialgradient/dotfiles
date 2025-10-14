@@ -2323,7 +2323,6 @@ nil)
           :desc "switch buffer"              ","  #'org-switchb
           :desc "goto heading"               "."  #'consult-org-heading
           :desc "goto agenda item"           "/"  #'consult-org-agenda
-          :desc "archive subtree"            "A"  #'org-archive-subtree
           :desc "export dispatch"            "e"  #'org-export-dispatch
           :desc "footnote new"               "f"  #'org-footnote-new
           :desc "toggle heading"             "h"  #'org-toggle-heading
@@ -2368,6 +2367,7 @@ File paths for Org documents, Deft notes, and etc. Note that modifying
         +org-capture-links-file "links.org"
         +org-capture-todo-file "todo.org"
         +org-capture-journal-file (format "%s/journal.org.gpg" org-directory)
+        org-archive-default-command 'org-archive-set-tag
         org-archive-location (concat org-directory "/archive/%s::")
         org-default-notes-file (concat org-directory "/inbox.org"))
   nil)
