@@ -2054,7 +2054,7 @@ https://orgmode.org/manual
         org-agenda-use-time-grid nil
         org-agenda-view-columns-initially nil
         org-agenda-window-setup 'only-window
-        org-columns-default-format "%TODO(State) %3PRIORITY(Pri) %6Effort(Effort){:} %50ITEM(Task) %TAGS(Tags)"
+        org-columns-default-format "%TODO(State) %3PRIORITY(Pri) %6Effort(Effort){:} %TAGS(Tags) %50ITEM(Task)"
         org-deadline-warning-days 7)
   nil)
 
