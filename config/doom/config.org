@@ -788,6 +788,14 @@ Prompts for an optional commit message suffix."
     (compile command)))
 #+end_src
 
+** do/minutes-to-duration
+#+begin_src elisp
+(defun do/minutes-to-duration (minutes &optional duration-fmt)
+  "Convert the integer MINUTES to a duration string formatted as DURATION_FMT (HH:MM by default)."
+  (let ((template (or format-str "%d:%02d")))
+    (format template (floor minutes 60) (mod minutes 60))))
+#+end_src
+
 * aider
 #+begin_src elisp :tangle no
 (use-package aider
@@ -2285,6 +2293,29 @@ nil)
                  (time-add (date-to-time current-date)
                            (days-to-time 1))))))
      nil 'tree)))
+#+end_src
+
+*** do/org-sum-effort-in-subtree
+#+begin_src elisp
+(defun do/org-sum-effort-in-subtree ()
+  "Sum the EFFORT of all children and set as parent's EFFORT.
+Also sum the EFFORT of TODO children as REMAINING."
+  (interactive)
+  (save-excursion
+    (let ((total 0)
+          (total-remaining 0))
+      ;; Map over all entries in the subtree
+      (org-map-entries (lambda ()
+                         (let ((effort (org-entry-get (point) "EFFORT")))
+                           (when effort
+                             (let ((mins (org-duration-string-to-minutes effort)))
+                               (setq total (+ total (floor mins 1)))
+                               ;; Check if the entry is a TODO item
+                               (when (member (org-get-todo-state) org-not-done-keywords)
+                                 (setq total-remaining (+ total-remaining (floor mins 1)))))))
+                         nil 'tree))
+      (org-entry-put (point) "EFFORT" (do/minutes-to-duration total))
+      (org-entry-put (point) "REMAINING" (do/minutes-to-duration total-remaining)))))
 #+end_src
 
 ** keybindings
