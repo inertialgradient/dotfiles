@@ -799,7 +799,7 @@ Prompts for an optional commit message suffix."
 #+begin_src elisp
 (defun do/minutes-to-duration (minutes &optional duration-fmt)
   "Convert the integer MINUTES to a duration string formatted as DURATION_FMT (HH:MM by default)."
-  (let ((template (or format-str "%d:%02d")))
+  (let ((template (or duration-fmt "%d:%02d")))
     (format template (floor minutes 60) (mod minutes 60))))
 #+end_src
 
