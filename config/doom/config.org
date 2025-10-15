@@ -2232,30 +2232,32 @@ nil)
 *** Insert headings
 
 #+begin_src elisp
-(defun do/org:insert-heading-above ()
-  "Insert heading above the current one."
-  (interactive)
-  (progn
-    (org-back-to-heading)
-    (move-beginning-of-line nil)
-    (org-insert-heading)
-    (evil-insert 1)))
+(after! org
+  (defun do/org:insert-heading-above ()
+    "Insert heading above the current one."
+    (interactive)
+    (progn
+      (org-back-to-heading)
+      (move-beginning-of-line nil)
+      (org-insert-heading)
+      (evil-insert 1)))
 
-(defun do/org:insert-heading-below ()
-  "Insert heading below the current section."
-  (interactive)
-  (progn
-    (org-insert-heading-respect-content nil)
-    (evil-insert 1)))
+  (defun do/org:insert-heading-below ()
+    "Insert heading below the current section."
+    (interactive)
+    (progn
+      (org-insert-heading-respect-content nil)
+      (evil-insert 1)))
 
-(defun do/org:insert-subheading-below ()
-  "Insert subheading below the current section."
-  (interactive)
-  (progn
-    (org-next-visible-heading 1)
-    (move-beginning-of-line nil)
-    (org-insert-subheading nil)
-    (evil-insert 1)))
+  (defun do/org:insert-subheading-below ()
+    "Insert subheading below the current section."
+    (interactive)
+    (progn
+      (org-next-visible-heading 1)
+      (move-beginning-of-line nil)
+      (org-insert-subheading nil)
+      (evil-insert 1)))
+  nil)
 #+end_src
 
 *** agenda dashbaord: update all clocktables
