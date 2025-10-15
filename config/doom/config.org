@@ -2017,10 +2017,73 @@ https://orgmode.org/manual
 
 ** org-agenda
 
-*** Global keybinding to fuzzy-search headers
+*** Agenda cycling
 #+begin_src elisp
-(map! "s-." #'consult-org-agenda
-      "C-s-." #'org-cycle-agenda-files)
+(defvar do/org:cycle-agenda--current-file nil
+  "Truename of the last agenda file visited by `do/org:cycle-agenda-files'.")
+
+(defun do/org:cycle-agenda--file-truenames ()
+  "Return a cons of (ORIGINALS . TRUENAMES) for `org-agenda-files' (existing only)."
+  (let* ((orig (or (org-agenda-files t)
+                   (user-error "No agenda files")))
+         (tns  (mapcar #'file-truename orig)))
+    (cons orig tns)))
+
+(defun do/org:cycle-agenda-files (&optional arg)
+  "Cycle through `org-agenda-files'. Positive ARG moves forward, negative moves backward.
+
+If called from outside an agenda file, jump to `todo.org` if present in the list
+(case-insensitive basename match), otherwise the first agenda file. Do not
+advance past that file on this initial jump. From within an agenda file, cycle
+as usual by one step in the chosen direction."
+  (interactive "p")
+  (pcase-let* ((`(,orig . ,tns) (do/org:cycle-agenda--file-truenames))
+               (len (length tns))
+               (step (if (and arg (< arg 0)) -1 1))
+               (cur  (and buffer-file-name (file-truename buffer-file-name)))
+               (in-agenda? (and cur (member cur tns)))
+               ;; Find index of a basename exactly equal to "todo.org" (case-insensitive)
+               (todo-idx (cl-position "todo.org" orig
+                                      :test (lambda (needle f)
+                                              (string= needle (downcase (file-name-nondirectory f))))))
+               (start-idx
+                (cond
+                 (in-agenda?
+                  (cl-position cur tns :test #'string=))
+                 ((integerp todo-idx)
+                  todo-idx)
+                 (t 0)))  ;; first file
+               ;; If we're outside an agenda file, don't offset; otherwise do the ±1 step
+               (next-idx (if in-agenda?
+                             (mod (+ start-idx step) len)
+                           start-idx))
+               (target    (nth next-idx orig))
+               (target-tn (nth next-idx tns)))
+    (find-file target)
+    (setq do/org:cycle-agenda--current-file target-tn)
+    (when (buffer-base-buffer)
+      (pop-to-buffer-same-window (buffer-base-buffer)))))
+#+end_src
+
+Compact keymap wrappers
+
+#+begin_src elisp
+(defun do/org:cycle-agenda-next ()
+  "Cycle forward through `org-agenda-files'."
+  (interactive)
+  (do/org:cycle-agenda-files +1))
+
+(defun do/org:cycle-agenda-prev ()
+  "Cycle backward through `org-agenda-files'."
+  (interactive)
+  (do/org:cycle-agenda-files -1))
+#+end_src
+
+*** Agenda cycling and searching keybindings
+#+begin_src elisp
+(map! "C-s-," #'do/org:cycle-agenda-prev
+      "C-s-." #'do/org:cycle-agenda-next
+      "s-." #'consult-org-agenda)
 #+end_src
 
 *** org-agenda keymaps
