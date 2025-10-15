@@ -2316,9 +2316,8 @@ nil)
     "Insert subheading below the current section."
     (interactive)
     (progn
-      (org-next-visible-heading 1)
-      (move-beginning-of-line nil)
-      (org-insert-subheading nil)
+      (org-insert-heading-respect-content nil)
+      (org-demote-subtree)
       (evil-insert 1)))
   nil)
 #+end_src
