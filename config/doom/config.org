@@ -2245,7 +2245,7 @@ nil)
   "Insert heading below the current section."
   (interactive)
   (progn
-    (do/org:insert-heading-respect-content nil)
+    (org-insert-heading-respect-content nil)
     (evil-insert 1)))
 
 (defun do/org:insert-subheading-below ()
@@ -2337,7 +2337,7 @@ Also sum the EFFORT of TODO children as REMAINING."
 #+begin_src elisp
 (after! org
   (setq org-M-RET-may-split-line nil
-        do/org:insert-heading-respect-content nil)
+        org-insert-heading-respect-content nil)
 
   (defun do/config:keybindings:org-mode-h ()
     (global-unset-key (kbd "s-RET"))
