@@ -2258,7 +2258,7 @@ nil)
     (evil-insert 1)))
 #+end_src
 
-*** update all clocktables in dashboard
+*** agenda dashbaord: update all clocktables
 
 #+begin_src elisp
 (defun do/org:agenda:update-dashboard ()
@@ -2269,7 +2269,7 @@ nil)
     (save-buffer)))
 #+end_src
 
-*** view agenda dashboard
+*** agenda dashboard: view
 #+begin_src elisp
 (defun do/org:agenda:view-dashboard ()
   (interactive)
