@@ -2424,15 +2424,18 @@ Also sum the EFFORT of TODO children as REMAINING."
     (map! :map evil-org-mode-map
           :n  "C-j"          #'org-next-visible-heading
           :n  "C-k"          #'org-previous-visible-heading
-          :ni "s-RET"        #'do/org:insert-heading-below
-          :ni "s-<return>"   #'do/org:insert-heading-below
-          :ni "s-S-RET"      #'do/org:insert-heading-above
-          :ni "s-S-<return>" #'do/org:insert-heading-above
-          :ni "s-C-RET"      #'do/org:insert-subheading-below
-          :ni "s-C-<return>" #'do/org:insert-subheading-below
-          :desc "make bold"           :nvi  "s-b" #'do/text:make-bold
-          :desc "make italic"         :nvi  "s-i" #'do/text:make-italic
-          :desc "make underlined"     :nvi  "s-u" #'do/text:make-underlined)
+          :ni "C-s-u"        #'outline-up-heading
+          :ni "C-s-p"        #'org-backward-heading-same-level
+          :ni "C-s-n"        #'org-forward-heading-same-level
+          ;; :ni "s-RET"        #'do/org:insert-heading-below
+          ;; :ni "s-<return>"   #'do/org:insert-heading-below
+          ;; :ni "s-S-RET"      #'do/org:insert-heading-above
+          ;; :ni "s-S-<return>" #'do/org:insert-heading-above
+          :ni "C-s-RET"      #'do/org:insert-subheading-below
+          :ni "C-s-<return>" #'do/org:insert-subheading-below
+          :nvi "s-b" #'do/text:make-bold
+          :nvi "s-i" #'do/text:make-italic
+          :nvi "s-u" #'do/text:make-underlined)
 
     (map! :map org-mode-map
           :localleader
