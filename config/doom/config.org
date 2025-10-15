@@ -37,7 +37,7 @@ See [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/emacs-lis
 Provide a command to trigger tangling manually.
 
 #+begin_src elisp
-(defun +config:tangle ()
+(defun do/config:tangle ()
   "Tangle config.org to Emacs lisp."
   (interactive)
   (+literate-tangle-h))
@@ -94,19 +94,19 @@ Omit background coloring in terminal emacs
 Darken the base background slightly.
 #+begin_src elisp :tangle no
 (when (display-graphic-p)
-  (defun +config:darken-background ()
+  (defun do/config:darken-background ()
     (let* ((default-bg (face-background 'default))
            (darker-bg (doom-darken default-bg 0.1)))
       (set-face-background 'default darker-bg)))
-  (+config:darken-background)
-  (add-hook! doom-load-theme #'+config:darken-background)
+  (do/config:darken-background)
+  (add-hook! doom-load-theme #'do/config:darken-background)
 nil)
 #+end_src
 
 Use base background for org-mode source blocks
 #+begin_src elisp
 (after! org
-  (defun +config:fix-org-backgrounds ()
+  (defun do/config:fix-org-backgrounds ()
     (if (display-graphic-p)
         ;; For GUI Emacs - use the default background
         (let ((default-bg (face-background 'default)))
@@ -127,17 +127,17 @@ Use base background for org-mode source blocks
       (set-face-background 'org-verbatim "unspecified-bg")
       (set-face-background 'org-quote "unspecified-bg")
       (set-face-background 'org-verse "unspecified-bg")))
-  (+config:fix-org-backgrounds) ;; Apply immediately
+  (do/config:fix-org-backgrounds) ;; Apply immediately
   ;; Also apply after theme changes
-  (add-hook! doom-load-theme #'+config:fix-org-backgrounds)
-  (add-hook! org-mode #'+config:fix-org-backgrounds))
+  (add-hook! doom-load-theme #'do/config:fix-org-backgrounds)
+  (add-hook! org-mode #'do/config:fix-org-backgrounds))
 #+end_src
 
 [emacs-plus] Toggle light/dark theme based on the current OS setting.
 https://github.com/d12frosted/homebrew-emacs-plus/blob/master/patches/emacs-28/system-appearance.patch
 
 #+begin_src elisp
-(defun +config:set-preferred-theme (appearance)
+(defun do/config:set-preferred-theme (appearance)
   "Load theme, taking current system APPEARANCE into consideration."
   (when (display-graphic-p)
     (progn
@@ -146,7 +146,7 @@ https://github.com/d12frosted/homebrew-emacs-plus/blob/master/patches/emacs-28/s
         ('light (load-theme 'doom-solarized-light t))
         ('dark (load-theme 'doom-one t))))))
 
-(add-hook 'ns-system-appearance-change-functions #'+config:set-preferred-theme)
+(add-hook 'ns-system-appearance-change-functions #'do/config:set-preferred-theme)
 #+end_src
 
 ** display: doom dashboard
@@ -242,17 +242,17 @@ Enable hl-todo mode in certain text modes.
 Disable line-numbering in org and markdown modes
 
 #+begin_src elisp
-(defun +config:display:disable-line-numbers ()
+(defun do/config:display:disable-line-numbers ()
   "Disable line numbers in the current buffer."
   (setq-local display-line-numbers nil))
 
-(add-hook! '(org-mode-hook markdown-mode-hook) #'+config:display:disable-line-numbers)
+(add-hook! '(org-mode-hook markdown-mode-hook) #'do/config:display:disable-line-numbers)
 #+end_src
 
 ** display: layout
 
 #+begin_src elisp
-(defun layout-main ()
+(defun do/layout-main ()
   (interactive)
   (let ((w-main nil)
         (w-top (selected-window))
@@ -323,19 +323,21 @@ Disable line-numbering in org and markdown modes
 
 ** scrolling
 
+QUESTION: Is this disabled or not? Supposedly not being tangled.
+
 #+begin_src elisp :tangle no
-(defun scroll-other-window-up ()
+(defun do/scroll-other-window-up ()
   "Scroll the other window up."
   (interactive)
   (scroll-other-window -3))
 
-(defun scroll-other-window-down ()
+(defun do/scroll-other-window-down ()
   "Scroll the other window down."
   (interactive)
   (scroll-other-window 3))
 
-(map! "M-p" #'scroll-other-window-up)
-(map! "M-n" #'scroll-other-window-down)
+(map! "M-p" #'do/scroll-other-window-up)
+(map! "M-n" #'do/scroll-other-window-down)
 #+end_src
 
 ** leader keys
@@ -347,17 +349,6 @@ Use comma for the local leader key.
 #+end_src
 
 ** super keys
-#+begin_src elisp
-(defun +vterm-here-in-cwd ()
-  "Open vterm in cwd instead of at project root."
-  (interactive)
-  (+vterm/here t))
-
-(defun +delete-frame-force ()
-  "Delete the current frame, without asking for confirmation."
-  (interactive)
-  (delete-frame nil t))
-#+end_src
 
 *** GUI Emacs
 Some general purpose super-key keybindings.
@@ -370,21 +361,21 @@ Some general purpose super-key keybindings.
 
 Use =s-`= to cycle between frames.
 #+begin_src elisp
-(defun +config:keybindings:overrides ()
+(defun do/config:keybindings:overrides ()
   (define-key help-quick-use-map (kbd "s-`") nil)
   (global-set-key (kbd "s-`") #'other-frame))
-(add-hook 'emacs-startup-hook #'+config:keybindings:overrides)
+(add-hook 'emacs-startup-hook #'do/config:keybindings:overrides)
 #+end_src
 
 #+begin_src elisp
 (map!
- "s-,"   #'+open-dotfiles
- "s-C-w" #'+delete-frame-force
+ "s-,"   #'do/workspace:open-dotfiles
+ "s-C-w" #'do/delete-frame-force
  "s-F"   #'avy-goto-char-timer
  "s-K"   #'kill-current-buffer
  "s-W"   #'+workspace/kill
  "s-a"   #'org-agenda-list
- "s-A"   #'do/org-agenda-dashboard
+ "s-A"   #'do/org:agenda:view-dashboard
  "s-f"   #'avy-goto-char-2
  "s-k"   #'bury-buffer
  "s-q"   #'save-buffers-kill-terminal
@@ -413,16 +404,16 @@ Use =s-`= to cycle between frames.
 (if (display-graphic-p)
     (map! "s-\""  #'+vterm/toggle        ;; in vterm drawer at project root
           "s-'"    #'vterm-other-window  ;; in vterm drawer
-          "s-C-'"  #'+vterm-here-in-cwd) ;; take over current buffer
+          "s-C-'"  #'do/vterm-here-in-cwd) ;; take over current buffer
   (map! "M-S-\"" #'+vterm/toggle
         "M-'"   #'vterm-other-window
-        "M-C-'" #'+vterm-here-in-cwd))
+        "M-C-'" #'do/vterm-here-in-cwd))
 #+end_src
 
 *** cut/copy/paste
 
 #+begin_src elisp
-(defun +kill-ring-save-to-both (beg end &optional region)
+(defun do/kill-ring-save-to-both (beg end &optional region)
   "Copy region to both the Emacs kill ring and system clipboard."
   (interactive "r\np")
   (kill-ring-save beg end region)
@@ -431,7 +422,7 @@ Use =s-`= to cycle between frames.
       (insert text)
       (call-process-region (point-min) (point-max) "pbcopy"))))
 
-(defun +kill-region-to-both (beg end &optional region)
+(defun do/kill-region-to-both (beg end &optional region)
   "Cut region to both the Emacs kill ring and system clipboard."
   (interactive "r\np")
   (kill-region beg end region)
@@ -442,8 +433,8 @@ Use =s-`= to cycle between frames.
         (call-process-region (point-min) (point-max) "pbcopy")))))
 
 (map! :nvie
-      "s-x" #'+kill-region-to-both
-      "s-c" #'+kill-ring-save-to-both
+      "s-x" #'do/kill-region-to-both
+      "s-c" #'do/kill-ring-save-to-both
       "s-v" #'clipboard-yank)
 #+end_src
 
@@ -494,20 +485,20 @@ Allow remembering risky local variables.
 #+end_src
 
 #+begin_src elisp
-(defun +config:enable-continuous-word-count ()
+(defun do/config:enable-continuous-word-count ()
   (interactive)
   (if (member major-mode doom-modeline-continuous-word-count-modes)
       (setq doom-modeline-enable-word-count (not doom-modeline-enable-word-count))
     (error (format "`%s' not in `doom-modeline-continuous-word-count-modes'" major-mode))))
 
-(map! :leader :prefix "t" :desc "Word count" "W" #'+config:enable-continuous-word-count)
+(map! :leader :prefix "t" :desc "Word count" "W" #'do/config:enable-continuous-word-count)
 #+end_src
 
 ** tmux-ish keybindings
 
 #+begin_src elisp
 (map! "C-h"    #'projectile-switch-project
-      "C-a ,"  #'+open-dotfiles
+      "C-a ,"  #'do/workspace:open-dotfiles
       "C-a -"  #'evil-window-split
       "C-a \\" #'evil-window-vsplit)
 #+end_src
@@ -538,20 +529,36 @@ Allow remembering risky local variables.
 
 (+global-word-wrap-mode)
 
-(defun +config:disable-word-wrap ()
+(defun do/config:disable-word-wrap ()
   (+word-wrap-mode -1))
-(add-hook! org-mode #'+config:disable-word-wrap)
-(add-hook! org-agenda-mode #'+config:disable-word-wrap)
+(add-hook! org-mode #'do/config:disable-word-wrap)
+(add-hook! org-agenda-mode #'do/config:disable-word-wrap)
 #+end_src
 
 * +utilities
 
 Some general-purpose functions.
 
-** +remove-from-list
+** do/vterm-here-in-cwd
+#+begin_src elisp
+(defun do/vterm-here-in-cwd ()
+  "Open vterm in cwd instead of at project root."
+  (interactive)
+  (+vterm/here t))
+#+end_src
+** do/delete-frame-force
 
 #+begin_src elisp
-(defun +remove-from-list (list-var &rest elements)
+(defun do/delete-frame-force ()
+  "Delete the current frame, without asking for confirmation."
+  (interactive)
+  (delete-frame nil t))
+#+end_src
+
+** do/remove-from-list
+
+#+begin_src elisp
+(defun do/remove-from-list (list-var &rest elements)
   "Remove ELEMENTS from the value of LIST-VAR.
    Usage:
     ;; (setq my-list '(a b c d e f))
@@ -560,10 +567,10 @@ Some general-purpose functions.
   (cl-remove-if (lambda (x) (member x elements)) list-var))
 #+end_src
 
-** +async-shell-command-below
+** do/async-shell-command-below
 
 #+begin_src elisp
-(defun +async-shell-command-below (command &optional buffer-name proportion)
+(defun do/async-shell-command-below (command &optional buffer-name proportion)
   "Execute COMMAND, displaying output in buffer (optionally named BUFFER-NAME),
 which that takes up PROPORTION of the frame height (default: 0.1).
 Dismiss the buffer and window on success, or switch focus to it on failure."
@@ -594,10 +601,10 @@ Dismiss the buffer and window on success, or switch focus to it on failure."
                                     (recenter -1)))))))))
 #+end_src
 
-** +open-file-in-new-buffer-right
+** do/open-file-in-new-buffer-right
 
 #+begin_src elisp
-(defun +open-file-in-new-buffer-right (filename)
+(defun do/open-file-in-new-buffer-right (filename)
   "Open a PDF file in a new buffer to the right of the current buffer, or reload if already open."
   (interactive "fOpen PDF file: ")
   (let ((buffer (get-file-buffer filename))
@@ -616,29 +623,29 @@ Dismiss the buffer and window on success, or switch focus to it on failure."
         (find-file filename)))))
 #+end_src
 
-** file-to-string
+** do/file-to-string
 
 #+begin_src elisp
-(defun file-to-string (filename)
+(defun do/file-to-string (filename)
   "Read the contents of file FILENAME to a string."
   (with-temp-buffer
     (insert-file-contents filename)
     (buffer-string)))
 #+end_src
 
-** is-proj-root-p
+** do/is-proj-root-p
 
 #+begin_src elisp
-(defun is-proj-root-p (filename)
+(defun do/is-proj-root-p (filename)
   "Is the given filename FILENAME a project root?"
   (or (file-directory-p (format "%s/.git" filename))
       (file-directory-p (format "%s/.projectile" filename))))
 #+end_src
 
-** kill-open-buffers-with-name-prefix
+** do/kill-open-buffers-with-name-prefix
 
 #+begin_src elisp
-(defun kill-open-buffers-with-name-prefix (prefix)
+(defun do/kill-open-buffers-with-name-prefix (prefix)
   (interactive)
   (seq-do
    #'kill-buffer
@@ -647,10 +654,10 @@ Dismiss the buffer and window on success, or switch focus to it on failure."
                (buffer-list))))
 #+end_src
 
-** get-url-surrounding-point
+** do/get-url-surrounding-point
 
 #+begin_src elisp
-(defun get-url-surrounding-point ()
+(defun do/get-url-surrounding-point ()
   (save-excursion
     (let* ((oldpoint (point)) (start (point)) (end (point))
            (syntaxes "w_")
@@ -678,24 +685,24 @@ Dismiss the buffer and window on success, or switch focus to it on failure."
         (buffer-substring-no-properties start end)))))
 #+end_src
 
-** ensure-url
+** do/ensure-url
 
 #+begin_src elisp
-(defun ensure-url (candidate-str)
+(defun do/ensure-url (candidate-str)
   "Ensure CANDIDATE-STR can be interpreted as a URL.
 Checking for a scheme (interpolating one if missing) and a hostname with a TLD.
 Return nil if the hostname is missing a TLD."
   (when candidate-str
-    (let* ((candidate-url (ensure-url-scheme candidate-str))
+    (let* ((candidate-url (do/ensure-url-scheme candidate-str))
            (hostname (nth 2 (split-string candidate-url "/"))))
       (when (string-match-p "\\." hostname)
         candidate-url))))
 #+end_src
 
-** ensure-url-scheme
+** do/ensure-url-scheme
 
 #+begin_src elisp
-(defun ensure-url-scheme (candidate-str)
+(defun do/ensure-url-scheme (candidate-str)
   "Ensure CANDIDATE-STR is prefixed with a scheme, or return the string prepended with one"
   (when candidate-str
     (if (or (string-prefix-p "https://" candidate-str t)
@@ -704,7 +711,7 @@ Return nil if the hostname is missing a TLD."
       (format "https://%s" (replace-regexp-in-string "^[^[:word:]]+" "" candidate-str)))))
 #+end_src
 
-** yank-buffer-path-dwim
+** do/yank-buffer-path-dwim
 
 Combines behavior from the following commands, unifying their interfaces with a =C-u= fallback.:
 
@@ -712,12 +719,12 @@ Combines behavior from the following commands, unifying their interfaces with a 
 - =+default/yank-buffer-path-relative-to-project=
 
 #+begin_src elisp
-(defun buffer-path-dwim (&optional abspath-p)
+(defun do/buffer-path-dwim (&optional abspath-p)
   "Return the path of the current buffer's file. (If `buffer-file-name' isn't set, use `default-directory'.)
 Abbreviate the path: If in a project, relative to project root; otherwise to the tilde-abbreviated user root.
 Provide an absolute path if the prefix argument ABSPATH-P is provided."
   (if-let ((file-path buffer-file-name))
-      (let* ((proj-path (expand-file-name (locate-dominating-file file-path #'is-proj-root-p)))
+      (let* ((proj-path (expand-file-name (locate-dominating-file file-path #'do/is-proj-root-p)))
              (disp-path (if abspath-p file-path
                           (replace-regexp-in-string (concat "^" proj-path) "" file-path))))
         disp-path)
@@ -725,24 +732,24 @@ Provide an absolute path if the prefix argument ABSPATH-P is provided."
 #+end_src
 
 #+begin_src elisp
-(defun yank-buffer-path-dwim (abspath-p)
+(defun do/yank-buffer-path-dwim (abspath-p)
   "Yank the path of the current buffer's file. (If `buffer-file-name' isn't set, use `default-directory'.)
 Abbreviate the path: If in a project, relative to project root; otherwise to the tilde-abbreviated user root.
 Provide an absolute path if the prefix argument ABSPATH-P is provided."
   (interactive "P")
-  (yank-with-echo (buffer-path-dwim abspath-p)))
+  (do/yank-with-echo (do/buffer-path-dwim abspath-p)))
 #+end_src
 
 #+begin_src elisp
-(defun yank-buffer-path-with-line-dwim (abspath-p)
+(defun do/yank-buffer-path-with-line-dwim (abspath-p)
   "Yank the path of the current buffer's file, along with line number of the point's current position.
 (If `buffer-file-name' isn't set, use `default-directory'.)
 Abbreviate the path: If in a project, relative to project root; otherwise to the tilde-abbreviated user root.
 Provide an absolute path if the prefix argument ABSPATH-P is provided."
   (interactive "P")
-  (let* ((yanked-path (buffer-path-dwim abspath-p))
+  (let* ((yanked-path (do/buffer-path-dwim abspath-p))
          (path-with-num (format "%s:%s" yanked-path (line-number-at-pos))))
-    (yank-with-echo path-with-num)))
+    (do/yank-with-echo path-with-num)))
 #+end_src
 
 #+begin_src elisp
@@ -750,25 +757,25 @@ Provide an absolute path if the prefix argument ABSPATH-P is provided."
 (map! :leader
       :prefix "f"
       (:prefix ("y" . "yank")
-       :desc "path"             "y" #'yank-buffer-path-dwim
+       :desc "path"             "y" #'do/yank-buffer-path-dwim
        :desc "path (~relative)" "Y" #'+default/yank-buffer-path
-       :desc "path+line"        "l" #'yank-buffer-path-with-line-dwim))
+       :desc "path+line"        "l" #'do/yank-buffer-path-with-line-dwim))
 #+end_src
 
-** yank-with-echo
+** do/yank-with-echo
 
 #+begin_src elisp
-(defun yank-with-echo (yanked &optional echo)
+(defun do/yank-with-echo (yanked &optional echo)
   (progn
     (kill-new yanked)
     (if echo (message echo)
       (message (format "Copied to clipboard: %s" yanked)))))
 #+end_src
 
-** +logos-deploy
+** do/logos-deploy
 
 #+begin_src elisp
-(defun +logos-deploy ()
+(defun do/logos-deploy ()
   "Deploy the logos project with a timestamped commit message.
 Prompts for an optional commit message suffix."
   (interactive)
@@ -794,6 +801,27 @@ Prompts for an optional commit message suffix."
   "Convert the integer MINUTES to a duration string formatted as DURATION_FMT (HH:MM by default)."
   (let ((template (or format-str "%d:%02d")))
     (format template (floor minutes 60) (mod minutes 60))))
+#+end_src
+
+** do/timestamp
+#+begin_src elisp
+(defun do/timestamp ()
+  "Return a timestamp in ISO 8601 format."
+  (concat
+   (format-time-string "%Y-%m-%dT%T")
+   ((lambda (x) (concat (substring x 0 3) ":" (substring x 3 5)))
+    (format-time-string "%z"))))
+#+end_src
+
+** do/delete-window-with-name-prefix
+#+begin_src elisp
+(defun do/delete-window-with-name-prefix (prefix)
+  "Delete the first matching window with the given name PREFIX."
+  (delete-window
+   (get-buffer-window
+    (seq-find
+     #'(lambda (buffer) (string-prefix-p prefix (buffer-name buffer)))
+     (buffer-list)))))
 #+end_src
 
 * aider
@@ -898,40 +926,28 @@ Add refresh hooks for magit > 2.4.0.
   (add-hook! magit-post-refresh #'diff-hl-magit-post-refresh))
 #+end_src
 
-Small improvement to =diff-hl-show-hunk-copy-original-text=.
-
-#+begin_src elisp
-(after! diff-hl-show-hunk
-  (defun diff-hl-show-hunk-copy-original-text ()
-    "Extracts all the lines from BUFFER starting with '-' to the kill ring."
-    (interactive)
-    (if-let (original-content diff-hl-show-hunk--original-content)
-        (yank-with-echo original-content "Original hunk content added to kill-ring"))
-    (message "Hunk is a new addition, no content to copy.")))
-#+end_src
-
 * dired
 
 From the normal state:
 - Enter dired in the CWD of the current buffer's file with =-=
 
 #+begin_src elisp
-(defun +config:keybindings:dired-jump ()
+(defun do/config:keybindings:dired-jump ()
   (map! :n "-" #'dired-jump))
-(add-hook! prog-mode #'+config:keybindings:dired-jump)
-(add-hook! text-mode #'+config:keybindings:dired-jump)
+(add-hook! prog-mode #'do/config:keybindings:dired-jump)
+(add-hook! text-mode #'do/config:keybindings:dired-jump)
 #+end_src
 
 From the normal state in dired mode:
 - Ensure quit with ZQ works
 
 #+begin_src elisp
-(defun +config:keybindings:dired ()
+(defun do/config:keybindings:dired ()
   (map! :map dired-mode-map
         :n "Z q" #'evil-quit
         :localleader
         :n "," #'casual-dired-tmenu))
-(add-hook! dired-mode #'+config:keybindings:dired)
+(add-hook! dired-mode #'do/config:keybindings:dired)
 #+end_src
 
 * evil
@@ -979,15 +995,15 @@ Re-map keybindings to follow when splitting by default.
 Better parallels emacs's =C-k= (kill to end of line) and evil's =C= (change to end of line).
 
 #+begin_src elisp
-(defun evil-change-line-to-start ()
+(defun do/evil-change-back-to-indentation ()
   "Delete the current line back to indentation level and enter insert state."
   (interactive)
   (kill-line)
   (evil-delete-back-to-indentation)
   (evil-insert-state))
 
-(map! :n  "S"   #'evil-change-line-to-start
-      :i  "C-s" #'evil-change-line-to-start)
+(map! :n  "S"   #'do/evil-change-back-to-indentation
+      :i  "C-s" #'do/evil-change-back-to-indentation)
 #+end_src
 
 *** character deletion
@@ -1001,12 +1017,12 @@ Enable some emacs chords in evil insert state:
 (map! :i "C-d" #'evil-delete-char
       :i "C-k" #'evil-delete-line)
 
-(defun +config:keybindings:hybrid ()
+(defun do/config:keybindings:hybrid ()
   (map! :map (org-mode-map evil-org-mode-map)
         :i "C-d" nil
         :i "C-k" nil))
 
-(add-hook! org-mode :append #'+config:keybindings:hybrid)
+(add-hook! org-mode :append #'do/config:keybindings:hybrid)
 #+end_src
 
 ** evil-cleverparens
@@ -1081,7 +1097,7 @@ https://github.com/blorbx/evil-quickscope
 Define "inside" motion for: buffer, paragraphs, delimiters.
 
 #+begin_src elisp
-(defun evil-sort-inner (textobj &optional desc)
+(defun do/evil-sort-inner (textobj &optional desc)
   "Sort inside the TEXTOBJ surrounding the point.
 When DESC is non-nil, sort in descending order.
 TEXTOBJ should be a symbol corresponding to `x' in the `evil-inner-x' functions."
@@ -1095,48 +1111,48 @@ TEXTOBJ should be a symbol corresponding to `x' in the `evil-inner-x' functions.
         (sort-lines desc beg end)))
     (goto-char start-pos)))
 
-(defun evil-sort-inner-paragraph (desc)
+(defun do/evil-sort-inner-paragraph (desc)
   "Sort inside the paragraph under the point.
 When called with a prefix argument DESC, sort in descending order."
   (interactive "P")
-  (evil-sort-inner 'paragraph desc))
+  (do/evil-sort-inner 'paragraph desc))
 
-(defun evil-sort-inner-buffer (desc)
+(defun do/evil-sort-inner-buffer (desc)
   "Sort inside the current buffer.
 When called with a prefix argument DESC, sort in descending order."
   (interactive "P")
-  (evil-sort-inner 'buffer desc))
+  (do/evil-sort-inner 'buffer desc))
 
-(defun evil-sort-inner-curly (desc)
+(defun do/evil-sort-inner-curly (desc)
   "Sort inside the current curly braces.
 When called with a prefix argument DESC, sort in descending order."
   (interactive "P")
-  (evil-sort-inner 'curly desc))
+  (do/evil-sort-inner 'curly desc))
 
-(defun evil-sort-inner-paren (desc)
+(defun do/evil-sort-inner-paren (desc)
   "Sort inside the current parentheses.
 When called with a prefix argument DESC, sort in descending order."
   (interactive "P")
-  (evil-sort-inner 'paren desc))
+  (do/evil-sort-inner 'paren desc))
 
-(defun evil-sort-inner-bracket (desc)
+(defun do/evil-sort-inner-bracket (desc)
   "Sort inside the current parentheses.
 When called with a prefix argument DESC, sort in descending order."
   (interactive "P")
-  (evil-sort-inner 'bracket desc))
+  (do/evil-sort-inner 'bracket desc))
 #+end_src
 
 Add sort motions to normal state map.
 
 #+begin_src elisp
-(map! :desc "sort paragraph lines" :n "g s i p" #'evil-sort-inner-paragraph
-      :desc "sort buffer lines"    :n "g s i g" #'evil-sort-inner-buffer
-      :desc "sort inside braces"   :n "g s i {" #'evil-sort-inner-curly
-      :desc "sort inside braces"   :n "g s i }" #'evil-sort-inner-curly
-      :desc "sort inside brackets" :n "g s i [" #'evil-sort-inner-bracket
-      :desc "sort inside brackets" :n "g s i ]" #'evil-sort-inner-bracket
-      :desc "sort inside parens"   :n "g s i (" #'evil-sort-inner-paren
-      :desc "sort inside parens"   :n "g s i )" #'evil-sort-inner-paren)
+(map! :desc "sort paragraph lines" :n "g s i p" #'do/evil-sort-inner-paragraph
+      :desc "sort buffer lines"    :n "g s i g" #'do/evil-sort-inner-buffer
+      :desc "sort inside braces"   :n "g s i {" #'do/evil-sort-inner-curly
+      :desc "sort inside braces"   :n "g s i }" #'do/evil-sort-inner-curly
+      :desc "sort inside brackets" :n "g s i [" #'do/evil-sort-inner-bracket
+      :desc "sort inside brackets" :n "g s i ]" #'do/evil-sort-inner-bracket
+      :desc "sort inside parens"   :n "g s i (" #'do/evil-sort-inner-paren
+      :desc "sort inside parens"   :n "g s i )" #'do/evil-sort-inner-paren)
 #+end_src
 
 ** evil-string-inflection
@@ -1199,7 +1215,7 @@ Use =g~= operator to cycle through inflection transformations.
 #+begin_src elisp
 (setq exercism--config-path (format "%s/exercism/user.json" (getenv "XDG_CONFIG_HOME")))
 (defun exercism--configure (api-token)
-  "Configure excerism with API-TOKEN."
+  "Configure excerism with API-TOKEN. Overrides `exercism--configure' from exercism.el."
   (setq exercism--api-token api-token)
   (exercism--run-shell-command (concat (shell-quote-argument exercism-executable)
                                        " configure"
@@ -1234,11 +1250,11 @@ Use =g~= operator to cycle through inflection transformations.
 ** Disable LSP
 
 #+begin_src elisp
-(defun +config:flycheck-disable-lsp ()
+(defun do/config:flycheck-disable-lsp ()
   (setq flycheck-disabled-checkers '(lsp)))
-(add-hook! prog-mode #'+config:flycheck-disable-lsp)
-(add-hook! text-mode #'+config:flycheck-disable-lsp)
-(add-hook! org-mode #'+config:flycheck-disable-lsp)
+(add-hook! prog-mode #'do/config:flycheck-disable-lsp)
+(add-hook! text-mode #'do/config:flycheck-disable-lsp)
+(add-hook! org-mode #'do/config:flycheck-disable-lsp)
 #+end_src
 
 * folding
@@ -1246,11 +1262,11 @@ Use =g~= operator to cycle through inflection transformations.
 Use tab to fold in prog modes.
 
 #+begin_src elisp
-(defun +config:tab-to-fold-in-normal-state ()
+(defun do/config:tab-to-fold-in-normal-state ()
   "Bind toggle-fold function to the <tab> key."
   (evil-local-set-key 'normal (kbd "<tab>") #'evil-toggle-fold))
 
-(add-hook! prog-mode #'+config:tab-to-fold-in-normal-state)
+(add-hook! prog-mode #'do/config:tab-to-fold-in-normal-state)
 #+end_src
 
 * formatting
@@ -1296,7 +1312,7 @@ https://github.com/leoliu/ggtags
 #+end_src
 
 #+begin_src elisp
-(defun project-gtags-refresh (arg)
+(defun do/project-gtags-refresh (arg)
   "Refresh the tags at project root, building tag files if in a project.
 If the prefix arg ARG is passed, delete the tags at project root."
   (interactive "P")
@@ -1311,7 +1327,7 @@ If the prefix arg ARG is passed, delete the tags at project root."
 (map! :leader
       :prefix "p"
       :desc "regenerate tags"
-      "G" #'project-gtags-refresh)
+      "G" #'do/project-gtags-refresh)
 #+end_src
 
 * latex
@@ -1328,20 +1344,19 @@ If the prefix arg ARG is passed, delete the tags at project root."
 ** Formatting
 
 #+begin_src elisp
-;; enable apheleia mode in LaTeX-mode
-(add-hook! latex-mode
-  (apheleia-mode +1))
-
-(add-hook! LaTeX-mode
-  (apheleia-mode +1))
+(defun do/disable-formatting ()
+  (message "[apheleia] Disabling apheleia-mode.")
+  (apheleia-mode -1))
+(add-hook! latex-mode #'do/disable-formatting)
+(add-hook! LaTeX-mode #'do/disable-formatting)
 #+end_src
 
 #+begin_src elisp
-(defun +make-LaTeX-math-mode (displaymode-p)
+(defun do/LaTeX:wrap-as-math (displaymode-p)
   "If in evil normal state, wrap the current WORD in math mode.
 If in an evil visual state, wrap the current selection in math mode."
   (interactive "P")
-  (if (or (point-on-empty-line-p)
+  (if (or (do/point-on-empty-line-p)
           (evil-insert-state-p))
       (if displaymode-p
           (progn
@@ -1353,7 +1368,7 @@ If in an evil visual state, wrap the current selection in math mode."
         (insert "\\(  \\)")
         (goto-char (- (point) 3))
         (evil-insert 1)))
-    (let* ((selected-text (+selected-text))
+    (let* ((selected-text (do/selected-text))
            (wrapped-text
             (if displaymode-p
                 (format "\\[%s\\]" selected-text)
@@ -1364,11 +1379,11 @@ If in an evil visual state, wrap the current selection in math mode."
 #+end_src
 
 #+begin_src elisp
-(defun +make-LaTeX-boxed ()
+(defun do/LaTeX:wrap-as-boxed ()
   (interactive)
-  (+wrap-in-LaTeX-cmd "boxed"))
+  (do/LaTeX:wrap-in-cmd "boxed"))
 
-(defun +make-LaTeX-in-SI-units ()
+(defun do/LaTeX:wrap-as-SI ()
   "Format the selected text with SI units in the buffer."
   (interactive)
   (let* ((selection (buffer-substring-no-properties (region-beginning) (region-end)))
@@ -1388,7 +1403,7 @@ If in an evil visual state, wrap the current selection in math mode."
 *** evaluate selection mathematically
 
 #+begin_src elisp
-(defun +LaTeX-evaluate-selection ()
+(defun do/LaTeX:evaluate-selection ()
   "Evaluate the selected expression numerically, converting LaTeX to
   mathematical operators as needed."
   (interactive)
@@ -1419,39 +1434,40 @@ If in an evil visual state, wrap the current selection in math mode."
 
 #+begin_src elisp
 (map! :map (LaTeX-mode-map latex-mode-map)
-      :desc "make bold"           :nv  "s-b" #'+make-text-bold
-      :desc "make italic"         :nv  "s-i" #'+make-text-italic
-      :desc "make underlined"     :nv  "s-u" #'+make-text-underlined
-      :desc "make math (inline)"  :nvi "C-l" #'+make-LaTeX-math-mode
-      :desc "make math (display)" :nvi "C-S-l" #'(lambda () (interactive) (+make-LaTeX-math-mode t)))
+      :desc "make bold"           :nv  "s-b" #'do/text:make-bold
+      :desc "make italic"         :nv  "s-i" #'do/text:make-italic
+      :desc "make underlined"     :nv  "s-u" #'do/text:make-underlined
+      :desc "make math (inline)"  :nvi "C-l" #'do/LaTeX:wrap-as-math
+      :desc "make math (display)" :nvi "C-S-l" #'(lambda () (interactive) (do/LaTeX:wrap-as-math t)))
 #+end_src
 
 #+begin_src elisp
 (map! :map (LaTeX-mode-map latex-mode-map)
       :localleader
       (:prefix (",", "assignments")
-       :desc "save and compile" :ni  "c" #'+LaTeX-save-and-compile
-       :desc "clean artifacts"  :ni  "C" #'+LaTeX-build-cleanup
-       :desc "open in Skim"     :ni  "o" #'+LaTeX-open-with-skim
-       :desc "open in Emacs"    :ni  "O" #'+LaTeX-open-doc))
+       :desc "save and compile" :ni  "c" #'do/LaTeX:save-and-compile
+       :desc "clean artifacts"  :ni  "C" #'do/LaTeX:build-cleanup
+       :desc "open in Skim"     :ni  "o" #'do/LaTeX:open-with-skim
+       :desc "open in Emacs"    :ni  "O" #'do/LaTeX:open-doc))
 #+end_src
+
 ** PDF auto-revert
 
 #+begin_src elisp
-(defun refresh-pdf-buffer-display ()
+(defun do/pdf:refresh-buffer-display ()
   "Refresh the display of the PDF buffer."
   (when (and (eq major-mode 'pdf-view-mode)
              (not (eq (current-buffer) (window-buffer (selected-window)))))
     (pdf-view-revert-buffer nil t)))
 
-(defun auto-revert-mode-pdf-view-refresh ()
+(defun do/auto-revert-mode-pdf-view-refresh ()
   "Enable auto-revert-mode and refresh display for PDF buffers."
-  (add-hook! auto-revert-mode 'refresh-pdf-buffer-display nil t))
+  (add-hook! auto-revert-mode #'do/pdf:refresh-buffer-display nil t))
 
 (setq auto-revert-interval 1)
 (setq auto-revert-verbose nil)
 
-(add-hook! pdf-view-mode #'auto-revert-mode-pdf-view-refresh)
+(add-hook! pdf-view-mode #'do/auto-revert-mode-pdf-view-refresh)
 (add-hook! pdf-view-mode #'auto-revert-mode)
 #+end_src
 
@@ -1459,7 +1475,7 @@ If in an evil visual state, wrap the current selection in math mode."
 *** Find associated document
 
 #+begin_src elisp
-(defun +LaTeX-find-associated-doc (&optional filetype)
+(defun do/LaTeX:find-associated-doc (&optional filetype)
   "If not at the project root, take the main doc's name from the current directory.
 Otherwise, assume the current file is the main doc."
   (interactive)
@@ -1484,53 +1500,53 @@ Otherwise, assume the current file is the main doc."
 *** Compile TeX
 
 #+begin_src elisp
-(defun +LaTeX-save-and-compile ()
+(defun do/LaTeX:save-and-compile ()
   (interactive)
   (if (not (string= "tex" (file-name-extension (buffer-file-name))))
       (save-buffer)
     (let* ((shell-command-prompt-show-cwd t)
-           (file-name (+LaTeX-find-associated-doc))
+           (file-name (do/LaTeX:find-associated-doc))
            (default-directory (projectile-project-root))
            (command (format "xelatex -shell-escape -interaction=nonstopmode -halt-on-error %s.tex" file-name)))
       (progn
         (save-buffer)
-        (+async-shell-command-below command nil 0.05)))))
+        (do/async-shell-command-below command nil 0.05)))))
 #+end_src
 
 *** Clean up build artifacts
 
 #+begin_src elisp
-(defun +LaTeX-build-cleanup ()
+(defun do/LaTeX:build-cleanup ()
   "Remove all aux, log, and out files in the project."
   (interactive)
   (let ((default-directory (projectile-project-root)))
-    (+async-shell-command-below "rm -f *.{aux,log,out}" nil 0.3)))
+    (do/async-shell-command-below "rm -f *.{aux,log,out}" nil 0.3)))
 #+end_src
 
 *** Open PDF
 
 #+begin_src elisp
-(defun +LaTeX-open-doc (arg)
+(defun do/LaTeX:open-doc (arg)
   (interactive "P")
-  (let ((file-name (+LaTeX-find-associated-doc "pdf"))
+  (let ((file-name (do/LaTeX:find-associated-doc "pdf"))
         (default-directory (projectile-project-root)))
     (if arg
         (call-process-shell-command (format "open -a Skim.app %s.pdf" file-name))
-      (+open-file-in-new-buffer-right (format "%s.pdf" file-name)))))
+      (do/open-file-in-new-buffer-right (format "%s.pdf" file-name)))))
 #+end_src
 
 #+begin_src elisp
-(defun +LaTeX-open-with-skim ()
+(defun do/LaTeX:open-with-skim ()
   (interactive)
-  (+LaTeX-open-doc t))
+  (do/LaTeX:open-doc t))
 #+end_src
 
 * text utilities
 
-*** point-on-empty-line-p
+*** do/point-on-empty-line-p
 
 #+begin_src elisp
-(defun point-on-empty-line-p ()
+(defun do/point-on-empty-line-p ()
   "Return t if the point is on an empty line, nil otherwise."
   (interactive)
   (save-excursion
@@ -1541,7 +1557,7 @@ Otherwise, assume the current file is the main doc."
 *** make selection between whitespace/delimiters
 
 #+begin_src elisp
-(defun select-around-point-to-whitespace-or-delimiters ()
+(defun do/select-around-point-to-whitespace-or-delimiters ()
   "Select characters around the current point up to whitespace in both directions."
   (interactive)
   (let ((start (point))
@@ -1570,22 +1586,22 @@ Otherwise, assume the current file is the main doc."
 *** text selection and delimiters
 
 #+begin_src elisp
-(defun +selected-text ()
+(defun do/selected-text ()
   (if (evil-visual-state-p)
       (string-trim (buffer-substring (mark) (point)))
     (progn
-      (select-around-point-to-whitespace-or-delimiters)
+      (do/select-around-point-to-whitespace-or-delimiters)
       (string-trim (buffer-substring (mark) (point))))))
 
-(defun +delimit-with (char)
-  (let ((selected-text (+selected-text)))
+(defun do/delimit-with (char)
+  (let ((selected-text (do/selected-text)))
     (progn
       (kill-region (mark) (point))
       (insert (format "%s%s%s" char selected-text char)))))
 
-(defun +wrap-in-LaTeX-cmd (cmd)
+(defun do/LaTeX:wrap-in-cmd (cmd)
   (interactive "sCommand: ")
-  (let ((selected-text (+selected-text)))
+  (let ((selected-text (do/selected-text)))
     (progn
       (kill-region (mark) (point))
       (insert (format "\\%s{%s}" cmd selected-text)))))
@@ -1594,51 +1610,51 @@ Otherwise, assume the current file is the main doc."
 *** text formatting: LaTeX, Markdown, Org
 
 #+begin_src elisp
-(defun +make-text-bold ()
+(defun do/text:make-bold ()
   (interactive)
   (pcase major-mode
     ((or 'latex-mode 'LaTeX-mode)
-     (+wrap-in-LaTeX-cmd "textbf"))
+     (do/LaTeX:wrap-in-cmd "textbf"))
     ('org-mode
-     (+delimit-with "*"))
+     (do/delimit-with "*"))
     ((or 'markdown-mode 'gfm-mode)
-     (+delimit-with "**"))
+     (do/delimit-with "**"))
     (_
      (message "Unrecognized mode: %s" major-mode))))
 
-(defun +make-text-italic ()
+(defun do/text:make-italic ()
   (interactive)
   (pcase major-mode
     ((or 'latex-mode 'LaTeX-mode)
-     (+wrap-in-LaTeX-cmd "textit"))
+     (do/LaTeX:wrap-in-cmd "textit"))
     ('org-mode
-     (+delimit-with "/"))
+     (do/delimit-with "/"))
     ((or 'markdown-mode 'gfm-mode)
-     (+delimit-with "*"))
+     (do/delimit-with "*"))
     (_
      (message "Unrecognized mode: %s" major-mode))))
 
-(defun +make-text-underlined ()
+(defun do/text:make-underlined ()
   (interactive)
   (pcase major-mode
     ((or 'latex-mode 'LaTeX-mode)
-     (+wrap-in-LaTeX-cmd "underline"))
+     (do/LaTeX:wrap-in-cmd "underline"))
     ('org-mode
-     (+delimit-with "_"))
+     (do/delimit-with "_"))
     ((or 'markdown-mode 'gfm-mode)
-     (+delimit-with "_"))
+     (do/delimit-with "_"))
     (_
      (message "Unrecognized mode: %s" major-mode))))
 
-(defun +make-text-strikethrough ()
+(defun do/text:make-strikethrough ()
   (interactive)
   (pcase major-mode
     ((or 'latex-mode 'LaTeX-mode)
-     (+wrap-in-LaTeX-cmd "sout"))
+     (do/LaTeX:wrap-in-cmd "sout"))
     ('org-mode
-     (+delimit-with "+"))
+     (do/delimit-with "+"))
     ((or 'markdown-mode 'gfm-mode)
-     (+delimit-with "~~"))
+     (do/delimit-with "~~"))
     (_
      (message "Unrecognized mode: %s" major-mode))))
 #+end_src
@@ -1726,51 +1742,49 @@ Remove the git flow hook added by doom.
 * magit: time tracking
 
 #+begin_src elisp
-(defun magit-clock-in ()
+(defun do/magit:clock-in ()
   "Clock in with Magit, reading a commit subject line from user input."
   (interactive)
   (let ((subject-line (read-string "Task: ")))
     (magit-run-git-with-editor "clock-in" subject-line)))
 
-(defun magit-clock-out ()
+(defun do/magit:clock-out ()
   "Clock out with Magit, opening the commit editor to finalize changes."
   (interactive)
   (magit-run-git-with-editor "clock-out-with-editor"))
 
 (after! magit
-  (transient-insert-suffix 'magit-commit "c" '("i" "Clock In" magit-clock-in))
-  (transient-insert-suffix 'magit-commit "c" '("o" "Clock Out" magit-clock-out)))
+  (transient-insert-suffix 'magit-commit "c" '("i" "Clock In" do/magit:clock-in))
+  (transient-insert-suffix 'magit-commit "c" '("o" "Clock Out" do/magit:clock-out)))
 #+end_src
 
+TODO: Consolidate with the above
 #+begin_src elisp
-(defun git-clock-in ()
+(defun do/git:clock-in ()
   "Clock in with Git, reading a commit subject line from user input."
   (interactive)
   (when-let ((subject-line (read-string "Task: ")))
     (shell-command-to-string (format "git-clock-in %s" subject-line))))
 
-(defun git-clock-out ()
+(defun do/git:clock-out ()
   "Clock out with Git, committing all changed and new files in the working tree."
   (interactive)
   (shell-command-to-string (format "git add --all && git-clock-out")))
-
-;; (map! :map prog-mode-map
-;;       "s-c" #'git-clock-in
-;;       "s-C" #'git-clock-out)
 #+end_src
 
 * magit: tagged commits
 
 #+begin_src elisp
-(defun magit-commit-tagged ()
+(defun do/magit-commit-tagged ()
   "Clock in with Magit, reading a commit subject line from user input."
   (interactive)
   (let ((subject-line (read-string "Message: ")))
     (magit-run-git-with-editor "commit-tagged" (split-string subject-line))))
 
 (after! magit
-  (transient-insert-suffix 'magit-commit "c" '("t" "Tagged" magit-commit-tagged)))
+  (transient-insert-suffix 'magit-commit "c" '("t" "Tagged" do/magit-commit-tagged)))
 #+end_src
+
 * markdown
 
 ** gfm-mode
@@ -1788,7 +1802,7 @@ Don't use electric quotes
 Clear pre-installed keymaps and set cleaned up keymaps.
 
 #+begin_src elisp
-(defun +config:keybindings:markdown ()
+(defun do/config:keybindings:markdown ()
   (defvar markdown-mode-style-map (make-sparse-keymap))
   (defvar markdown-mode-command-map (make-sparse-keymap))
   (defvar markdown-mode-map (make-sparse-keymap))
@@ -1797,16 +1811,16 @@ Clear pre-installed keymaps and set cleaned up keymaps.
   (map! :map markdown-mode-map
         :ni "C-j" #'markdown-next-visible-heading
         :ni "C-k" #'markdown-previous-visible-heading
-        :nvi  "s-b" #'+make-text-bold
-        :nvi  "s-i" #'+make-text-italic
-        :nvi  "s-u" #'+make-text-underlined)
+        :nvi  "s-b" #'do/text:make-bold
+        :nvi  "s-i" #'do/text:make-italic
+        :nvi  "s-u" #'do/text:make-underlined)
 
   (map! :map markdown-mode-map
         :localleader
         :desc "edit code block"     :n "'"  #'markdown-edit-code-block
         :desc "export"              :n "e"  #'markdown-export
         :desc "open"                :n "o"  #'markdown-open
-        :desc "gfm-preview"         :n "p"  #'+gfm-preview
+        :desc "gfm-preview"         :n "p"  #'do/gfm-preview
         :desc "markdown-preview"    :n "P"  #'markdown-preview
        (:prefix ("h" . "header")
         :desc "dwim"                :nv "h"  #'markdown-insert-header-setext-dwim
@@ -1849,13 +1863,13 @@ Clear pre-installed keymaps and set cleaned up keymaps.
 
 (after! markdown-mode
   (remove-hook! markdown-mode #'doom--enable-+javascript-npm-mode-in-markdown-mode-h)
-  (add-hook! markdown-mode :append #'+config:keybindings:markdown))
+  (add-hook! markdown-mode :append #'do/config:keybindings:markdown))
 #+end_src
 
 ** =markdown-preview=: gfm-ish preview
 
 #+begin_src elisp
-(defun xwwp-browse-url (url &optional new-session)
+(defun do/xwwp-browse-url (url &optional new-session)
   "Ask xwidget-webkit to browse URL.
 NEW-SESSION specifies whether to create a new xwidget-webkit session.
 Interactively, URL defaults to the string looking like a url around point."
@@ -1871,13 +1885,13 @@ Interactively, URL defaults to the string looking like a url around point."
 #+end_src
 
 #+begin_src elisp :tangle no
-(setq browse-url-browser-function #'xwwp-browse-url)
+(setq browse-url-browser-function #'do/xwwp-browse-url)
 #+end_src
 
 ** =markdown-preview-gfm=: gfm preview with mathjax
 
 #+begin_src elisp
-(defun +gfm-preview ()
+(defun do/gfm-preview ()
   "Preview markdown with direct HTML and MathJax rendering."
   (interactive)
   (let* ((markdown-content (buffer-string))
@@ -1983,7 +1997,7 @@ renderMarkdown();
 </html>"))
 
     ;; Open the file in xwidget-webkit
-    (xwwp-browse-url (concat "file://" preview-file))))
+    (do/xwwp-browse-url (concat "file://" preview-file))))
 #+end_src
 
 * org
@@ -2018,12 +2032,12 @@ https://orgmode.org/manual
 
 *** Save all Org buffers after any agenda action
 #+begin_src elisp
-(defun +save-org-agenda-files (&rest _)
+(defun do/org:agenda:save-all-files (&rest _)
   (interactive)
   (org-save-all-org-buffers))
 
 ;; Save after any agenda action
-(defun +org--save-agenda-buffers (&rest _)
+(defun do/org:agenda:save-buffers-advice (&rest _)
   "Save all Org agenda buffers after an agenda command."
   (org-save-all-org-buffers))
 
@@ -2041,7 +2055,7 @@ https://orgmode.org/manual
                  org-agenda-set-tags
                  org-agenda-todo
                  ))
-    (advice-add cmd :after #'+org--save-agenda-buffers)))
+    (advice-add cmd :after #'do/org:agenda:save-buffers-advice)))
 #+end_src
 
 *** Agenda configuration
@@ -2202,10 +2216,10 @@ nil)
 ** bullets
 
 #+begin_src elisp
-(defun +config:display:org-bullets ()
+(defun do/config:display:org-bullets ()
   (org-bullets-mode +1))
 
-(add-hook! org-mode #'+config:display:org-bullets)
+(add-hook! org-mode #'do/config:display:org-bullets)
 #+end_src
 
 ** display
@@ -2218,7 +2232,7 @@ nil)
 *** Insert headings
 
 #+begin_src elisp
-(defun org-insert-heading-above ()
+(defun do/org:insert-heading-above ()
   "Insert heading above the current one."
   (interactive)
   (progn
@@ -2227,14 +2241,14 @@ nil)
     (org-insert-heading)
     (evil-insert 1)))
 
-(defun org-insert-heading-below ()
+(defun do/org:insert-heading-below ()
   "Insert heading below the current section."
   (interactive)
   (progn
-    (org-insert-heading-respect-content nil)
+    (do/org:insert-heading-respect-content nil)
     (evil-insert 1)))
 
-(defun org-insert-subheading-below ()
+(defun do/org:insert-subheading-below ()
   "Insert subheading below the current section."
   (interactive)
   (progn
@@ -2247,7 +2261,7 @@ nil)
 *** update all clocktables in dashboard
 
 #+begin_src elisp
-(defun +org-update-dashboard ()
+(defun do/org:agenda:update-dashboard ()
   "Rebuild all clocktables in the dashboard file."
   (interactive)
   (with-current-buffer (find-file-noselect +org-agenda-dashboard-file)
@@ -2255,11 +2269,11 @@ nil)
     (save-buffer)))
 #+end_src
 
-*** do/org-agenda-dashboard
+*** view agenda dashboard
 #+begin_src elisp
-(defun do/org-agenda-dashboard ()
+(defun do/org:agenda:view-dashboard ()
   (interactive)
-  (+org-update-dashboard)
+  (do/org:agenda:update-dashboard)
   (let* ((buf-name "*Org Dashboard*")
          (buf (get-buffer buf-name)))
     (if buf
@@ -2274,9 +2288,9 @@ nil)
       (switch-to-buffer buf))))
 #+end_src
 
-*** schedule items on successive days
+*** schedule subtree items on successive days
 #+begin_src elisp
-(defun org-schedule-subtree-items-on-successive-days (start-date target-level)
+(defun do/org:schedule-subtree-items-on-successive-days (start-date target-level)
   "Set scheduled dates for all headings of the TARGET-LEVEL in subtree, starting from START-DATE."
   (interactive
    (list
@@ -2295,9 +2309,9 @@ nil)
      nil 'tree)))
 #+end_src
 
-*** do/org-sum-effort-in-subtree
+*** sum effort in subtree
 #+begin_src elisp
-(defun do/org-sum-effort-in-subtree ()
+(defun do/org:sum-effort-in-subtree ()
   "Sum the EFFORT of all children and set as parent's EFFORT.
 Also sum the EFFORT of TODO children as REMAINING."
   (interactive)
@@ -2323,9 +2337,9 @@ Also sum the EFFORT of TODO children as REMAINING."
 #+begin_src elisp
 (after! org
   (setq org-M-RET-may-split-line nil
-        org-insert-heading-respect-content nil)
+        do/org:insert-heading-respect-content nil)
 
-  (defun +config:keybindings:org-mode ()
+  (defun do/config:keybindings:org-mode ()
     (global-unset-key (kbd "s-RET"))
     (global-unset-key (kbd "s-<return>"))
 
@@ -2335,15 +2349,15 @@ Also sum the EFFORT of TODO children as REMAINING."
     (map! :map evil-org-mode-map
           :n  "C-j"          #'org-next-visible-heading
           :n  "C-k"          #'org-previous-visible-heading
-          :ni "s-RET"        #'org-insert-heading-below
-          :ni "s-<return>"   #'org-insert-heading-below
-          :ni "s-S-RET"      #'org-insert-heading-above
-          :ni "s-S-<return>" #'org-insert-heading-above
-          :ni "s-C-RET"      #'org-insert-subheading-below
-          :ni "s-C-<return>" #'org-insert-subheading-below
-          :desc "make bold"           :nvi  "s-b" #'+make-text-bold
-          :desc "make italic"         :nvi  "s-i" #'+make-text-italic
-          :desc "make underlined"     :nvi  "s-u" #'+make-text-underlined)
+          :ni "s-RET"        #'do/org:insert-heading-below
+          :ni "s-<return>"   #'do/org:insert-heading-below
+          :ni "s-S-RET"      #'do/org:insert-heading-above
+          :ni "s-S-<return>" #'do/org:insert-heading-above
+          :ni "s-C-RET"      #'do/org:insert-subheading-below
+          :ni "s-C-<return>" #'do/org:insert-subheading-below
+          :desc "make bold"           :nvi  "s-b" #'do/text:make-bold
+          :desc "make italic"         :nvi  "s-i" #'do/text:make-italic
+          :desc "make underlined"     :nvi  "s-u" #'do/text:make-underlined)
 
     (map! :map org-mode-map
           :localleader
@@ -2367,7 +2381,7 @@ Also sum the EFFORT of TODO children as REMAINING."
           :desc "toggle checkbox"            "x"  #'org-toggle-checkbox
           :desc "insert template"         :n "s" #'org-insert-structure-template))
 
-  (add-hook! org-mode :append #'+config:keybindings:org-mode))
+  (add-hook! org-mode :append #'do/config:keybindings:org-mode))
 #+end_src
 
 ** file paths
@@ -2380,8 +2394,8 @@ File paths for Org documents, Deft notes, and etc. Note that modifying
 #+end_src
 
 #+begin_src elisp
-(defun +org-agenda-file-names ()
-  (+remove-from-list
+(defun do/config:org:agenda-file-names ()
+  (do/remove-from-list
    (directory-files org-directory nil "\\.org\\'")
    "beorg-reminders.org"
    "beorg-calendar.org"
@@ -2390,7 +2404,7 @@ File paths for Org documents, Deft notes, and etc. Note that modifying
 
 #+begin_src elisp
 (after! org
-  (setq org-agenda-files (+org-agenda-file-names)
+  (setq org-agenda-files (do/config:org:agenda-file-names)
         +org-agenda-dashboard-file (concat org-directory "/dashboard.org")
         +org-capture-projects-file "projects.org"
         +org-capture-changelog-file "changelog.org"
@@ -2423,7 +2437,7 @@ Open capture modal with C-SPC
 #+end_src
 
 #+begin_src elisp
-(defun +org-capture--get-clipboard-url ()
+(defun do/org:capture:link--get-clipboard-url ()
   "Return a URL from the system clipboard if it looks like one, else prompt the user."
   (let* ((clip (string-trim (shell-command-to-string "pbpaste")))
          (url (if (string-match-p "^https?://" clip)
@@ -2431,9 +2445,9 @@ Open capture modal with C-SPC
                 (read-string "URL: "))))
     url))
 
-(defun +org-capture--make-link-entry ()
+(defun do/org:capture:link--make-entry ()
   "Return an Org capture entry string for a clipboard or prompted URL."
-  (let ((url (+org-capture--get-clipboard-url))
+  (let ((url (do/org:capture:link--get-clipboard-url))
         (title (read-string "Link title: ")))
     (format "** [[%s][%s]]\n%s"
             url title (format-time-string "[%Y-%m-%d %a]"))))
@@ -2466,39 +2480,39 @@ Open capture modal with C-SPC
            :prepend t)
           ("l" "Link" entry
            (file+headline +org-capture-links-file-path "Inbox")
-           #'+org-capture--make-link-entry
+           #'do/org:capture:link--make-entry
            :prepend t
            :immediate-finish t)
 
           ("b" "Blog")
           ("bp" "Project" entry
            (file+headline "blog/projects.org" "Projects")
-           (function +org-hugo-new-project-capture-template)
+           (function do/org:capture:hugo:project)
            :prepend t
            :jump-to-captured t
-           :after-finalize #'+org-capture-save-target-buffer-h)
+           :after-finalize #'do/org:capture:save-target-buffer-h)
           ("bc" "Commonplace" entry
            (file+headline "blog/commonplaces.org" "Commonplaces")
-           (function +org-hugo-new-commonplace-capture-template)
+           (function do/org:capture:hugo:commonplace)
            :prepend t
-           :after-finalize #'+org-capture-save-target-buffer-h)
+           :after-finalize #'do/org:capture:save-target-buffer-h)
           ("bm" "Marginalia" entry
            (file+headline "blog/marginalia.org" "Marginalia")
-           (function +org-hugo-new-marginalia-capture-template)
+           (function do/org:capture:hugo:marginalia)
            :prepend t
-           :after-finalize #'+org-capture-save-target-buffer-h)
+           :after-finalize #'do/org:capture:save-target-buffer-h)
           ("bn" "Notes" entry
            (file+headline "blog/notebook.org" "Notes")
-           (function +org-hugo-new-project-capture-template)
+           (function do/org:capture:hugo:project)
            :prepend t
            :jump-to-captured t
-           :after-finalize #'+org-capture-save-target-buffer-h)
+           :after-finalize #'do/org:capture:save-target-buffer-h)
           ("bs" "Summary" entry
            (file+headline "blog/notebook.org" "Notes")
-           (function +org-hugo-new-summary-capture-template)
+           (function do/org:capture:hugo:summary)
            :prepend t
            :jump-to-captured t
-           :after-finalize #'+org-capture-save-target-buffer-h)
+           :after-finalize #'do/org:capture:save-target-buffer-h)
 
           ;; Will use {project-root}/{todo,notes,changelog}.org, unless a
           ;; {todo,notes,changelog}.org file is found in a parent directory.
@@ -2631,7 +2645,7 @@ https://github.com/bastibe/org-journal
 #+end_src
 
 #+begin_src elisp
-(defun org-journal-find-location ()
+(defun do/org:journal:find-location ()
   "Open today's journal entry."
   ;; Open today's journal, but specify a non-nil prefix argument in order to
   ;; inhibit inserting the heading; org-capture will insert the heading.
@@ -2640,10 +2654,10 @@ https://github.com/bastibe/org-journal
   ;; will add the new entry as a child entry.
   (goto-char (point-max)))
 
-(defun org-journal-today ()
+(defun do/org:journal:open-today ()
   "Open today's journal."
   (interactive)
-  (org-journal-find-location)
+  (do/org:journal:find-location)
   (goto-char (point-max)))
 #+end_src
 
@@ -2699,7 +2713,7 @@ https://github.com/bastibe/org-journal
       org-hugo-export-with-toc nil)
 #+end_src
 
-*** org-hugo-headline patch
+*** org-hugo-headline patch (override)
 
 Fixes an issue where tags are displayed in headlines
 
@@ -2707,8 +2721,8 @@ Fixes an issue where tags are displayed in headlines
 (after! ox-hugo
   (defun org-hugo-headline (headline contents info)
     "Transcode HEADLINE element into Markdown format.
-CONTENTS is the headline contents.  INFO is a plist used as
-a communication channel."
+CONTENTS is the headline contents. INFO is a plist used as
+a communication channel. Overrides `ox-hugo-deadline' in `ox-hugo'."
     (unless (org-element-property :footnote-section-p headline)
       (let* ((numbers (org-hugo--get-headline-number headline info nil))
              (loffset (string-to-number (plist-get info :hugo-level-offset))) ;"" -> 0, "0" -> 0, "1" -> 1, ..
@@ -2754,20 +2768,9 @@ a communication channel."
 #+end_src
 
 *** ox-hugo capture template functions
-**** timestamp helper
-
-#+begin_src elisp
-(defun hugo-timestamp ()
-  "Return a timestamp in ISO 8601 format."
-  (concat
-   (format-time-string "%Y-%m-%dT%T")
-   ((lambda (x) (concat (substring x 0 3) ":" (substring x 3 5)))
-    (format-time-string "%z"))))
-#+end_src
-
 **** save-file hook
 #+begin_src elisp
-(defun +org-capture-save-target-buffer-h ()
+(defun do/org:capture:save-target-buffer-h ()
   "Save the target buffer after an Org capture is finalized.
 Intended for use as :after-finalize in org-capture-templates, or
 as a global hook via `org-capture-after-finalize-hook'."
@@ -2775,14 +2778,15 @@ as a global hook via `org-capture-after-finalize-hook'."
              (derived-mode-p 'org-mode))
     (save-buffer)))
 #+end_src
+
 **** projects
 #+begin_src elisp
-(defun +org-hugo-new-project-capture-template ()
+(defun do/org:capture:hugo:project ()
   "Return `org-capture' template string for new Hugo blog post.
 See `org-capture-templates' for more information."
   (save-match-data
     (let ((date (format-time-string "%Y-%m-%d" (current-time)))
-          (timestamp (hugo-timestamp))
+          (timestamp (do/timestamp))
           (title (read-from-minibuffer "Project: " ""))
           (summary (read-from-minibuffer "Summary: " "")))
       (mapconcat #'identity
@@ -2799,12 +2803,12 @@ See `org-capture-templates' for more information."
 
 **** article summaries
 #+begin_src elisp
-(defun +org-hugo-new-summary-capture-template ()
+(defun do/org:capture:hugo:summary ()
   "Return `org-capture' template string for new Hugo blog post.
 See `org-capture-templates' for more information."
   (save-match-data
     (let ((date (format-time-string "%Y-%m-%d" (current-time)))
-          (timestamp (hugo-timestamp))
+          (timestamp (do/timestamp))
           (title (read-from-minibuffer "Title: " ""))
           (summary (read-from-minibuffer "Summary: " "")))
       (mapconcat #'identity
@@ -2830,11 +2834,11 @@ See `org-capture-templates' for more information."
 **** marginalia
 
 #+begin_src elisp
-(defun +org-hugo-new-marginalia-capture-template ()
+(defun do/org:capture:hugo:marginalia ()
   "Return `org-capture' template string for new Hugo marginalia post.
 See `org-capture-templates' for more information."
   (save-match-data
-    (let ((timestamp (hugo-timestamp))
+    (let ((timestamp (do/timestamp))
           (date (format-time-string "%Y-%m-%d" (current-time)))
           (title (read-from-minibuffer "Description: " "")))
       (mapconcat #'identity
@@ -2851,7 +2855,7 @@ See `org-capture-templates' for more information."
 **** commonplaces
 
 #+begin_src elisp
-(defun +org-hugo-new-commonplace-capture-template ()
+(defun do/org:capture:hugo:commonplace ()
   "Return `org-capture' template string for new Hugo commonplace post.
 See `org-capture-templates' for more information."
   (save-match-data
@@ -2861,7 +2865,7 @@ See `org-capture-templates' for more information."
           (source (read-from-minibuffer "Source Title: "))
           (cite (read-from-minibuffer "Citation Date: "))
           (url (read-from-minibuffer "Source URL: "))
-          (timestamp (hugo-timestamp))
+          (timestamp (do/timestamp))
           (type (car (cdr  (read-multiple-choice
                             "Source Type: "
                             '((?b "book" "Book / Magazine / Film / Album")
@@ -2886,11 +2890,12 @@ See `org-capture-templates' for more information."
                  "\n"))))
 #+end_src
 
-*** +org-hugo-export-all
+
+*** export all subtrees in all org files
 
 #+begin_src elisp
 ;;;###autoload
-(defun +org-hugo-export-all (&optional dir)
+(defun do/org:hugo:export-all (&optional dir)
   "Export every Hugo-ready subtree in all .org files under DIR."
   (let ((dir    (expand-file-name (or dir default-directory)))
         (files  (directory-files-recursively dir "\\.org$")))
@@ -3002,13 +3007,13 @@ Add Python project types: Pipenv, Poetry, Pytest
 (map! :map python-mode-map
       :localleader
       :prefix ("v" . "virtualenv")
-      :desc "activate"       :n "a" #'pyvenv-activate-venv-dwim
+      :desc "activate"       :n "a" #'do/python:pyvenv:activate-venv-dwim
       :desc "deactivate"     :n "d" #'pyvenv-deactivate
       :desc "restart python" :n "r" #'pyvenv-restart-python)
 #+end_src
 
 #+begin_src elisp
-(defun pyvenv-activate-venv-dwim ()
+(defun do/python:pyvenv:activate-venv-dwim ()
   "Activate the virtualenv at project root, if one can be found.
 If it can't, delegate to `pyvenv-activate', which will prompt for a path."
   (interactive)
@@ -3045,8 +3050,8 @@ Bind test-running keybindings.
 (map! :map python-mode-map
       :ni "s-<return>"   #'python-pytest-file
       :ni "s-RET"        #'python-pytest-file
-      :ni "s-C-<return>" #'python-pytest-window-delete
-      :ni "s-C-RET"      #'python-pytest-window-delete
+      :ni "s-C-<return>" #'do/python:pytest:delete-window
+      :ni "s-C-RET"      #'do/python:pytest:delete-window
       :ni "s-S-<return>" #'python-pytest-repeat
       :ni "s-S-RET"      #'python-pytest-repeat)
 
@@ -3060,7 +3065,7 @@ Bind test-running keybindings.
       :desc "file"        :n "f" #'python-pytest-file
       :desc "last"        :n "l" #'python-pytest-repeat
       :desc "last failed" :n "L" #'python-pytest-last-failed
-      :desc "close"       :n "c" #'python-pytest-window-delete
+      :desc "close"       :n "c" #'do/python:pytest:delete-window
       :desc "dispatch"    :n "." #'python-pytest-dispatch
       "F" nil
       "T" nil
@@ -3071,18 +3076,10 @@ Bind test-running keybindings.
 kill any open pytest compilation buffers
 
 #+begin_src elisp
-(defun window-with-name-prefix-delete (prefix)
-  "Delete the first matching window with the given name PREFIX."
-  (delete-window
-   (get-buffer-window
-    (seq-find
-     #'(lambda (buffer) (string-prefix-p prefix (buffer-name buffer)))
-     (buffer-list)))))
-
-(defun python-pytest-window-delete ()
+(defun do/python:pytest:delete-window ()
   "Delete the pytest compilation windows."
   (interactive)
-  (window-with-name-prefix-delete "*pytest*"))
+  (do/delete-window-with-name-prefix "*pytest*"))
 #+end_src
 
 ** repl: py-vterm-interaction
@@ -3160,19 +3157,19 @@ Use =rjsx-mode= for React and React-TypeScript files.
 Use =C-RET= to expand emmet tags.
 
 #+begin_src elisp
-(defun +config:keybindings:web ()
+(defun do/config:keybindings:web ()
   (map! :ni "C-<return>" #'emmet-expand-line))
 
-(add-hook! '(web-mode-hook rjsx-mode-hook) #'+config:keybindings:web)
+(add-hook! '(web-mode-hook rjsx-mode-hook) #'do/config:keybindings:web)
 #+end_src
 
 Emmet should expand classes as =className= in JSX modes.
 
 #+begin_src elisp
-(defun +config:emmet-expand-jsx-classname ()
+(defun do/config:emmet-expand-jsx-classname ()
   (setq emmet-expand-jsx-className? t))
 
-(add-hook! '(rjsx-mode-hook typescript-tsx-mode-hook) #'+config:emmet-expand-jsx-classname)
+(add-hook! '(rjsx-mode-hook typescript-tsx-mode-hook) #'do/config:emmet-expand-jsx-classname)
 #+end_src
 
 * ruby
@@ -3182,7 +3179,7 @@ Emmet should expand classes as =className= in JSX modes.
 Set descriptions for prefixes and commands to aid discoverability.
 
 #+begin_src elisp
-(defun +config:keybindings:ruby ()
+(defun do/config:keybindings:ruby ()
   (map! :localleader :map robe-mode-map "'" nil "h" nil "R" nil)
   (map! :localleader :map rubocop-mode-map "f" nil "F" nil "p" nil "P" nil)
   (map! :localleader :map ruby-mode-map "{" nil)
@@ -3205,12 +3202,12 @@ Set descriptions for prefixes and commands to aid discoverability.
          :desc "region & go"          "R"  #'ruby-send-region-and-go
          :desc "switch to inf"        "i"  #'ruby-switch-to-inf)))
 
-(add-hook! ruby-mode #'+config:keybindings:ruby)
+(add-hook! ruby-mode #'do/config:keybindings:ruby)
 #+end_src
 
 #+begin_src elisp
 ;; clear projectile-rails's keybinds
-(defun +config:keybindings:rails ()
+(defun do/config:keybindings:rails ()
   (map! :localleader :map projectile-rails-mode-map "r" nil)
   (map! :localleader
         :map ruby-mode-map
@@ -3269,7 +3266,7 @@ Set descriptions for prefixes and commands to aid discoverability.
         :desc "package"       "p" #'projectile-rails-goto-package))
   nil)
 
-(add-hook! ruby-mode #'+config:keybindings:rails)
+(add-hook! ruby-mode #'do/config:keybindings:rails)
 #+end_src
 
 ** evil-rails
@@ -3326,7 +3323,7 @@ Unbind conflicting globally set keybindings.
 Unbind =rspec-mode= bindings and re-bind.
 
 #+begin_src elisp
-(defun +config:keybindings:rspec ()
+(defun do/config:keybindings:rspec ()
   (map! :map (rspec-mode-map rspec-verifiable-mode-map)
         :localleader
         :prefix "t"
@@ -3365,7 +3362,7 @@ Unbind =rspec-mode= bindings and re-bind.
         :desc "single (test)" :n "T" #'ruby-test-run-at-point
         :desc "yank command"  :n "y" #'rspec-yank-last-command))
 
-(add-hook! ruby-mode #'+config:keybindings:rspec)
+(add-hook! ruby-mode #'do/config:keybindings:rspec)
 #+end_src
 
 ** ruby-test
@@ -3383,9 +3380,9 @@ https://github.com/ruby-test-mode/ruby-test-mode
 Enable projectile-rails to find either a controller spec or request spec file as the alternate for a controller implementation file.
 
 #+begin_src elisp
-(defun rails--parse-project-file ()
+(defun do/ruby:rails--parse-project-file ()
   "Parse the current buffer's path and return a list of filename components."
-  (let ((path (buffer-path-dwim)))
+  (let ((path (do/buffer-path-dwim)))
     (if (string-match (rx (group (or "app" "spec")) "/"
                           (group (1+ word)) "/"
                           (group (1+ anything))
@@ -3398,7 +3395,7 @@ Enable projectile-rails to find either a controller spec or request spec file as
 #+end_src
 
 #+begin_src elisp
-(defun rails--test-file (test-file)
+(defun do/ruby:rails--test-file (test-file)
   "Choose the correct test-file given TEST-FILE for the current Rails project.
 Look for a request spec if there's no controller spec."
   (if (or (string-match-p "controllers" test-file) (string-match-p "requests" test-file))
@@ -3409,9 +3406,9 @@ Look for a request spec if there's no controller spec."
 #+end_src
 
 #+begin_src elisp
-(defun rails--find-related-file (path)
+(defun do/ruby:rails--find-related-file (path)
   "Toggle between controller implementation at PATH and its request spec."
-  (let* ((comps (rails--parse-project-file))
+  (let* ((comps (do/ruby:rails--parse-project-file))
          (dir (alist-get 'dir comps))
          (subdir (alist-get 'subdir comps))
          (file (alist-get 'file comps)))
@@ -3420,7 +3417,7 @@ Look for a request spec if there's no controller spec."
                         (format "app/controllers/%s.rb"
                                 (replace-regexp-in-string "_requests$" "_controller" file))
                       (format "app/%s/%s.rb" subdir file)))
-        (list :test (rails--test-file (format "spec/%s/%s_spec.rb" subdir file))))))
+        (list :test (do/ruby:rails--test-file (format "spec/%s/%s_spec.rb" subdir file))))))
 #+end_src
 
 #+begin_src elisp
@@ -3432,7 +3429,7 @@ Look for a request spec if there's no controller spec."
                                     :test "bundle exec rspec --no-profile --format progress"
                                     :test-dir "spec/"
                                     :test-suffix "_spec"
-                                    :related-files-fn #'rails--find-related-file)
+                                    :related-files-fn #'do/ruby:rails--find-related-file)
 
   (projectile-register-project-type 'rails-rspec
                                     '("Gemfile" "app" "lib" "db" "config" "spec")
@@ -3441,7 +3438,7 @@ Look for a request spec if there's no controller spec."
                                     :test "bin/rspec --no-profile --format progress"
                                     :test-dir "spec/"
                                     :test-suffix "_spec"
-                                    :related-files-fn #'rails--find-related-file))
+                                    :related-files-fn #'do/ruby:rails--find-related-file))
 #+end_src
 
 ** seeing-is-believing
@@ -3456,14 +3453,14 @@ Look for a request spec if there's no controller spec."
 
 (add-hook! ruby-mode #'seeing-is-believing)
 
-(defun xmpfilter-eval-current-line ()
+(defun do/ruby:eval-current-line ()
   "Mark the current line for evaluation and evaluate."
   (interactive)
   (seeing-is-believing-mark-current-line-for-xmpfilter)
   (seeing-is-believing-run-as-xmpfilter))
 
 (map! :map ruby-mode-map
-      :desc "evaluate line"  "C-c C-c" #'xmpfilter-eval-current-line
+      :desc "evaluate line"  "C-c C-c" #'do/ruby:eval-current-line
       :desc "evaluate clear" "C-c C-v" #'seeing-is-believing-clear
       :desc "evaluate file"  "C-c C-f" #'seeing-is-believing-run)
 #+end_src
@@ -3471,7 +3468,7 @@ Look for a request spec if there's no controller spec."
 ** toggle-breakpoint
 
 #+begin_src elisp
-(defun ruby/toggle-breakpoint (&optional in-pipeline)
+(defun do/ruby:debug:toggle-breakpoint (&optional in-pipeline)
   "Add a break point, highlight it. Pass IN-PIPELINE to add using tap."
   (interactive "P")
   (when (eq major-mode 'ruby-mode)
@@ -3487,7 +3484,11 @@ Look for a request spec if there's no controller spec."
           (insert "\n")
           (indent-according-to-mode))))))
 
-(defun python/toggle-breakpoint ()
+(defun do/ruby:debug:toggle-breakpoint-pipeline ()
+  (interactive)
+  (do/ruby:debug:toggle-breakpoint t))
+
+(defun do/python:debug:toggle-breakpoint ()
   "Add a break point and highlight it."
   (interactive)
   (when (eq major-mode 'python-mode)
@@ -3504,13 +3505,13 @@ Look for a request spec if there's no controller spec."
 (map! :mode 'ruby-mode
       :localleader
       :prefix ("d" . "debug")
-      :desc "binding.pry" :n "b" #'ruby/toggle-breakpoint
-      :desc "binding.pry (pipeline)" :n "B" #'(lambda () (interactive) (ruby/toggle-breakpoint t)))
+      :desc "binding.pry" :n "b" #'do/ruby:debug:toggle-breakpoint
+      :desc "binding.pry (pipeline)" :n "B" #'do/ruby:debug:toggle-breakpoint-pipeline)
 
 (map! :mode 'python-mode
       :localleader
       :prefix ("d" . "debug")
-      :desc "insert breakpoint" :n "b" #'python/toggle-breakpoint)
+      :desc "insert breakpoint" :n "b" #'do/python:debug:toggle-breakpoint)
 #+end_src
 
 ** ruby-refactor
@@ -3522,9 +3523,9 @@ Look for a request spec if there's no controller spec."
 ** flycheck
 
 #+begin_src elisp
-(defun +config:flycheck-set-checker-ruby ()
+(defun do/config:flycheck-set-checker-ruby ()
   (flycheck-select-checker 'ruby-rubocop))
-(add-hook! ruby-mode #'+config:flycheck-set-checker-ruby)
+(add-hook! ruby-mode #'do/config:flycheck-set-checker-ruby)
 #+end_src
 
 * rust
@@ -3536,9 +3537,9 @@ Use tree-sitter.
 
 Use =rustc= for syntax checking.
 #+begin_src elisp
-(defun +config:flycheck-set-checker-rust ()
+(defun do/config:flycheck-set-checker-rust ()
   (flycheck-select-checker 'rust))
-(add-hook! rust-ts-mode #'+config:flycheck-set-checker-rust)
+(add-hook! rust-ts-mode #'do/config:flycheck-set-checker-rust)
 #+end_src
 
 * smartparens
@@ -3569,12 +3570,12 @@ https://www.emacswiki.org/emacs/TypographicalPunctuationMarks
 #+begin_src elisp
 (require 'typopunct)
 
-(defun +config:typopunct:enable ()
+(defun do/config:typopunct:enable-h ()
   "Set up typopunct mode."
   (typopunct-change-language 'english t)
   (typopunct-mode 1))
 
-;; (add-hook! '(org-mode-hook markdown-mode-hook) #'+config:typopunct:enable)
+;; (add-hook! '(org-mode-hook markdown-mode-hook) #'do/config:typopunct:enable-h)
 #+end_src
 
 * webkit
@@ -3594,13 +3595,13 @@ Reminders:
 ** browser-open keybindings
 
 #+begin_src elisp
-(map! :n "g F" #'browser-open-dwim)
+(map! :n "g F" #'do/browser-open-dwim)
 #+end_src
 
 ** browser-open commands
 
 #+begin_src elisp
-(defun browser-open-dwim (use-new-session)
+(defun do/browser-open-dwim (use-new-session)
   "Open webkit and navigate to a destination in the precedence order described below.
 If given the prefix argument USE-NEW-SESSION, use a new session instead of re-using an existing webkit session.
 
@@ -3613,7 +3614,7 @@ Precedence order:
   (interactive "P")
   (let* ((region-text (when (use-region-p)
                         (buffer-substring (region-beginning) (region-end))))
-         (url-at-point (unless region-text (ensure-url (get-url-surrounding-point))))
+         (url-at-point (unless region-text (do/ensure-url (do/get-url-surrounding-point))))
          (history '("localhost:" "google.com"))
          (user-input (unless (or region-text url-at-point)
                        (string-trim (read-from-minibuffer "goto: " "localhost:" nil nil '(history . 1)))))
@@ -3626,13 +3627,13 @@ Precedence order:
 ** xwidget-widget keybindings
 
 #+begin_src elisp
-(defun +config:keybindings:xwidget-webkit ()
+(defun do/config:keybindings:xwidget-webkit ()
   "Configure xwidget keybindings."
   (evil-define-key*
     'normal xwidget-webkit-mode-map
     "g"  nil
     "f"  #'xwwp-follow-link
-    "gf" #'browser-open-dwim
+    "gf" #'do/browser-open-dwim
     "gg" #'xwidget-webkit-scroll-top
     "G"  #'xwidget-webkit-scroll-bottom
     "h"  #'xwidget-webkit-back
@@ -3642,62 +3643,62 @@ Precedence order:
     "Y"  #'xwidget-webkit-current-url-message-kill))
 
 (evil-set-initial-state 'xwidget-webkit-mode 'normal)
-(add-hook! xwidget-webkit-mode #'+config:keybindings:xwidget-webkit)
+(add-hook! xwidget-webkit-mode #'do/config:keybindings:xwidget-webkit)
 #+end_src
 
 ** smooth scrolling
 
 #+begin_src elisp
 (after! xwidget
-  (defun +xwidget-webkit-smooth-scroll-down ()
+  (defun do/xwidget-webkit:smooth-scroll-down ()
     "Smooth scroll down in webkit."
     (interactive)
     (xwidget-webkit-execute-script (xwidget-webkit-current-session)
                                    "window.scrollBy({top: 30, behavior: 'smooth'});"))
 
-  (defun +xwidget-webkit-smooth-scroll-up ()
+  (defun do/xwidget-webkit:smooth-scroll-up ()
     "Smooth scroll up in webkit."
     (interactive)
     (xwidget-webkit-execute-script (xwidget-webkit-current-session)
                                    "window.scrollBy({top: -30, behavior: 'smooth'});"))
 
   (map! :map xwidget-webkit-mode-map
-        :n "j" #'+xwidget-webkit-smooth-scroll-down
-        :n "k" #'+xwidget-webkit-smooth-scroll-up))
+        :n "j" #'do/xwidget-webkit:smooth-scroll-down
+        :n "k" #'do/xwidget-webkit:smooth-scroll-up))
 #+end_src
 
 * word chars
 
 #+begin_src elisp
-(defun +config:add-dot-to-word-chars ()
+(defun do/config:add-dot-to-word-chars ()
   "Adds underscore to the word chars syntax entry list."
   (modify-syntax-entry ?. "w"))
 
-(defun +config:add-underscore-to-word-chars ()
+(defun do/config:add-underscore-to-word-chars ()
   "Adds underscore to the word chars syntax entry list."
   (modify-syntax-entry ?_ "w"))
 
-(defun +config:add-dash-to-word-chars ()
+(defun do/config:add-dash-to-word-chars ()
   "Adds underscore to the word chars syntax entry list."
   (modify-syntax-entry ?- "w"))
 
-(defun +config:add-to-word-char-list ()
+(defun do/config:add-to-word-char-list ()
   "Customize the word char list in prog and other modes."
-  (add-hook! LaTeX-mode      #'+config:add-dot-to-word-chars)
-  (add-hook! latex-mode      #'+config:add-dot-to-word-chars)
-  (add-hook! coffee-mode     #'+config:add-dash-to-word-chars)
-  (add-hook! coffee-mode     #'+config:add-underscore-to-word-chars)
-  (add-hook! emacs-lisp-mode #'+config:add-dash-to-word-chars)
-  (add-hook! markdown-mode   #'+config:add-underscore-to-word-chars)
-  (add-hook! org-mode        #'+config:add-underscore-to-word-chars)
-  (add-hook! prog-mode       #'+config:add-dash-to-word-chars)
-  (add-hook! prog-mode       #'+config:add-underscore-to-word-chars)
-  (add-hook! python-mode     #'+config:add-underscore-to-word-chars)
-  (add-hook! restclient-mode #'+config:add-underscore-to-word-chars)
-  (add-hook! text-mode       #'+config:add-underscore-to-word-chars)
+  (add-hook! LaTeX-mode      #'do/config:add-dot-to-word-chars)
+  (add-hook! latex-mode      #'do/config:add-dot-to-word-chars)
+  (add-hook! coffee-mode     #'do/config:add-dash-to-word-chars)
+  (add-hook! coffee-mode     #'do/config:add-underscore-to-word-chars)
+  (add-hook! emacs-lisp-mode #'do/config:add-dash-to-word-chars)
+  (add-hook! markdown-mode   #'do/config:add-underscore-to-word-chars)
+  (add-hook! org-mode        #'do/config:add-underscore-to-word-chars)
+  (add-hook! prog-mode       #'do/config:add-dash-to-word-chars)
+  (add-hook! prog-mode       #'do/config:add-underscore-to-word-chars)
+  (add-hook! python-mode     #'do/config:add-underscore-to-word-chars)
+  (add-hook! restclient-mode #'do/config:add-underscore-to-word-chars)
+  (add-hook! text-mode       #'do/config:add-underscore-to-word-chars)
   nil)
 
-(+config:add-to-word-char-list)
+(do/config:add-to-word-char-list)
 #+end_src
 
 * workspaces
@@ -3705,7 +3706,7 @@ Precedence order:
 ** open config workspace
 
 #+begin_src elisp
-(defun +open-dotfiles ()
+(defun do/workspace:open-dotfiles ()
   "Create a new workspace, switch to it, then open the DOTFILES_DIR in dired."
   (interactive)
   (progn
@@ -3719,18 +3720,10 @@ Precedence order:
 Open on main org todo doc.
 
 #+begin_src elisp :tangle no
-(defun +open-org-todos ()
+(defun do/workspace:open-org-todos ()
   "Open the main Org mode file in the main workspace."
   (find-file (format "%s/%s" (getenv "ORG_HOME") +org-capture-todo-file)))
-(add-hook! emacs-startup #'+open-org-todos)
-#+end_src
-
-Open a new draft buffer.
-
-#+begin_src elisp
-(defun +new-draft-buffer ()
-  (interactive)
-  (switch-to-buffer (get-buffer-create "*draft*")))
+(add-hook! emacs-startup #'do/workspace:open-org-todos)
 #+end_src
 
 Open on an empty buffer in the main workspace.
@@ -3750,7 +3743,7 @@ Open on an empty buffer in the main workspace.
 ** keybindings
 
 #+begin_src elisp
-(map! "s-t" #'+workspace/clone
+(map! "s-t" #'do/workspace:clone
       "s-T" #'+workspace/new
       "s-;" #'+workspace/other
       "s-{" #'+workspace/switch-left
@@ -3762,7 +3755,7 @@ Open on an empty buffer in the main workspace.
 Clone the current workspace when opening a new one. Name it intelligently.
 
 #+begin_src elisp
-(defun +workspace/clone ()
+(defun do/workspace:clone ()
   "Clone the current workspace, naming it with the next available sequential index.
 If started from an indexed workspace (e.g., 'name:5'), fills in gaps from 1 upward.
 Creates 'name:1' if it doesn't exist yet and places it to the left.
@@ -3869,7 +3862,7 @@ Only creates the next higher index if all lower indices exist."
 Helper function to increment a string with a numeric suffix.
 
 #+begin_src elisp
-(defun +workspace--increment-name (text)
+(defun do/workspace:--increment-name (text)
   "Transform workspace names by adding or incrementing a numeric suffix.
 Examples: 'workspace' -> 'workspace:1', 'workspace:1' -> 'workspace:2'"
   (interactive "sEnter workspace text: ")
@@ -3946,8 +3939,7 @@ Set parameters for =copy-as-format=.
 Add some yankee motions for evil mode.
 
 #+begin_src elisp
-(defun perfidious-yank-inner (textobj)
-  "docstring"
+(defun do/yankee:yank-inner (textobj)
   (interactive)
   (let ((evil-textobj (intern (format "evil-inner-%s" textobj)))
         (start-pos (point)))
@@ -3960,29 +3952,29 @@ Add some yankee motions for evil mode.
           (yankee-yank beg end))))
     (goto-char start-pos)))
 
-(defun perfidious-yank-inner-paragraph ()
+(defun do/yankee:yank-inner-paragraph ()
   "Yank the current paragraph with annotations using `yankee-yank'."
   (interactive)
-  (perfidious-yank-inner 'paragraph))
+  (do/yankee:yank-inner 'paragraph))
 
-(defun perfidious-yank-inner-buffer ()
+(defun do/yankee:yank-inner-buffer ()
   "Yank the current buffer with annotations using `yankee-yank'."
   (interactive)
-  (perfidious-yank-inner 'buffer))
+  (do/yankee:yank-inner 'buffer))
 
 (after! yankee
   (map! (:prefix "g"
          :v "y" #'yankee-yank
          :n "y" nil
          (:prefix ("y" . "yanqui")
-          :desc "yanq paragraph"        :n "p" #'perfidious-yank-inner-paragraph
-          :desc "yanq buffer"           :n "b" #'perfidious-yank-inner-buffer))))
+          :desc "yanq paragraph" :n "p" #'do/yankee:yank-inner-paragraph
+          :desc "yanq buffer"    :n "b" #'do/yankee:yank-inner-buffer))))
 #+end_src
 
 * yasnippet
 
 #+begin_src elisp
-(defun yas/camelcase-file-name ()
+(defun do/yas:camelcase-file-name ()
   "Camel-case the current buffer's file name."
   (interactive)
   (let ((filename
@@ -3991,52 +3983,52 @@ Add some yankee motions for evil mode.
                                       (buffer-name (current-buffer)))))))
     (mapconcat #'capitalize (split-string filename "[_\-]") "")))
 
-(defun yas/strip (str)
+(defun do/yas:strip (str)
   "Extract a parameter name from STR."
   (replace-regexp-in-string ":.*$" ""
    (replace-regexp-in-string "^\s+" ""
     (replace-regexp-in-string "," ""
      str))))
 
-(defun yas/to-field-assignment (str)
+(defun do/yas:to-field-assignment (str)
   "Make 'STR' to 'self.`STR` = `STR`'."
-  (format "self.%s = %s" (yas/strip str) (yas/strip str)))
+  (format "self.%s = %s" (do/yas:strip str) (do/yas:strip str)))
 
-(defun yas/prepend-colon (str)
+(defun do/yas:prepend-colon (str)
   "Make `STR' to :`STR'."
-  (format ":%s" (yas/strip str)))
+  (format ":%s" (do/yas:strip str)))
 
-(defun yas/indent-level ()
+(defun do/yas:indent-level ()
   "Determine the number of spaces the current line is indented."
   (interactive)
   (string-match "[^[:space:]]" (thing-at-point 'line t)))
 
-(defun yas/indent-string ()
+(defun do/yas:indent-string ()
   "Return a string of spaces matching the current indentation level."
   (interactive)
-  (make-string (yas/indent-level) ?\s))
+  (make-string (do/yas:indent-level) ?\s))
 
-(defun yas/indented-newline ()
+(defun do/yas:indented-newline ()
   "Newline followed by correct indentation."
   (interactive)
-  (format "\n%s" (yas/indent-string)))
+  (format "\n%s" (do/yas:indent-string)))
 
-(defun yas/args-list ()
+(defun do/yas:args-list ()
   "Extract an args list from the current line."
   (interactive)
   (string-match "\(.+\)" (thing-at-point 'line t)))
 
-(defun yas/to-ruby-accessors (str)
+(defun do/yas:to-ruby-accessors (str)
   "Splits STR into an `attr_accesor' statement."
   (interactive)
-  (mapconcat 'yas/prepend-colon (split-string str ",") ", "))
+  (mapconcat 'do/yas:prepend-colon (split-string str ",") ", "))
 
-(defun yas/to-ruby-setters (str)
+(defun do/yas:to-ruby-setters (str)
   "Splits STR into a sequence of field assignments."
   (interactive)
-  (mapconcat 'yas/to-field-assignment
+  (mapconcat 'do/yas:to-field-assignment
              (split-string str ",")
-             (yas/indented-newline)))
+             (do/yas:indented-newline)))
 #+end_src
 
 * hacks
