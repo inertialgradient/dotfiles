@@ -2332,6 +2332,17 @@ Also sum the EFFORT of TODO children as REMAINING."
       (org-entry-put (point) "REMAINING" (do/minutes-to-duration total-remaining)))))
 #+end_src
 
+*** bulk-add effot to subtree
+#+begin_src elisp
+(defun do/org:set-effort-on-subtree (effort)
+  "Bulk set EFFORT property on all subheadings of the current tree."
+  (interactive "sEffort: ")
+  (org-map-entries
+   (lambda () (org-set-property "EFFORT" effort))
+   nil
+   'tree))
+#+end_src
+
 ** keybindings
 
 #+begin_src elisp
