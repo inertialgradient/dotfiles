@@ -2641,7 +2641,7 @@ Open capture modal with C-SPC
 #+begin_src elisp
 (after! org
   (setq org-adapt-indentation t
-        org-blank-before-new-entry '((heading . auto) (plain-list-item . auto))
+        org-blank-before-new-entry '((heading . nil) (plain-list-item . nil))
         org-catch-invisible-edits 'show-and-error
         org-confirm-babel-evaluate nil
         org-cycle-separator-lines 2
