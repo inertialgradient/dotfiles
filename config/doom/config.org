@@ -94,19 +94,19 @@ Omit background coloring in terminal emacs
 Darken the base background slightly.
 #+begin_src elisp :tangle no
 (when (display-graphic-p)
-  (defun do/config:darken-background ()
+  (defun do/config:darken-background-h ()
     (let* ((default-bg (face-background 'default))
            (darker-bg (doom-darken default-bg 0.1)))
       (set-face-background 'default darker-bg)))
   (do/config:darken-background)
-  (add-hook! doom-load-theme #'do/config:darken-background)
+  (add-hook! doom-load-theme #'do/config:darken-background-h)
 nil)
 #+end_src
 
 Use base background for org-mode source blocks
 #+begin_src elisp
 (after! org
-  (defun do/config:fix-org-backgrounds ()
+  (defun do/config:fix-org-backgrounds-h ()
     (if (display-graphic-p)
         ;; For GUI Emacs - use the default background
         (let ((default-bg (face-background 'default)))
@@ -127,17 +127,17 @@ Use base background for org-mode source blocks
       (set-face-background 'org-verbatim "unspecified-bg")
       (set-face-background 'org-quote "unspecified-bg")
       (set-face-background 'org-verse "unspecified-bg")))
-  (do/config:fix-org-backgrounds) ;; Apply immediately
+  (do/config:fix-org-backgrounds-h) ;; Apply immediately
   ;; Also apply after theme changes
-  (add-hook! doom-load-theme #'do/config:fix-org-backgrounds)
-  (add-hook! org-mode #'do/config:fix-org-backgrounds))
+  (add-hook! doom-load-theme #'do/config:fix-org-backgrounds-h)
+  (add-hook! org-mode #'do/config:fix-org-backgrounds-h))
 #+end_src
 
 [emacs-plus] Toggle light/dark theme based on the current OS setting.
 https://github.com/d12frosted/homebrew-emacs-plus/blob/master/patches/emacs-28/system-appearance.patch
 
 #+begin_src elisp
-(defun do/config:set-preferred-theme (appearance)
+(defun do/config:set-preferred-theme-h (appearance)
   "Load theme, taking current system APPEARANCE into consideration."
   (when (display-graphic-p)
     (progn
@@ -146,7 +146,7 @@ https://github.com/d12frosted/homebrew-emacs-plus/blob/master/patches/emacs-28/s
         ('light (load-theme 'doom-solarized-light t))
         ('dark (load-theme 'doom-one t))))))
 
-(add-hook 'ns-system-appearance-change-functions #'do/config:set-preferred-theme)
+(add-hook 'ns-system-appearance-change-functions #'do/config:set-preferred-theme-h)
 #+end_src
 
 ** display: doom dashboard
@@ -242,11 +242,11 @@ Enable hl-todo mode in certain text modes.
 Disable line-numbering in org and markdown modes
 
 #+begin_src elisp
-(defun do/config:display:disable-line-numbers ()
+(defun do/config:display:disable-line-numbers-h ()
   "Disable line numbers in the current buffer."
   (setq-local display-line-numbers nil))
 
-(add-hook! '(org-mode-hook markdown-mode-hook) #'do/config:display:disable-line-numbers)
+(add-hook! '(org-mode-hook markdown-mode-hook) #'do/config:display:disable-line-numbers-h)
 #+end_src
 
 ** display: layout
@@ -361,10 +361,10 @@ Some general purpose super-key keybindings.
 
 Use =s-`= to cycle between frames.
 #+begin_src elisp
-(defun do/config:keybindings:overrides ()
+(defun do/config:keybindings:overrides-h ()
   (define-key help-quick-use-map (kbd "s-`") nil)
   (global-set-key (kbd "s-`") #'other-frame))
-(add-hook 'emacs-startup-hook #'do/config:keybindings:overrides)
+(add-hook 'emacs-startup-hook #'do/config:keybindings:overrides-h)
 #+end_src
 
 #+begin_src elisp
@@ -529,10 +529,10 @@ Allow remembering risky local variables.
 
 (+global-word-wrap-mode)
 
-(defun do/config:disable-word-wrap ()
+(defun do/config:disable-word-wrap-h ()
   (+word-wrap-mode -1))
-(add-hook! org-mode #'do/config:disable-word-wrap)
-(add-hook! org-agenda-mode #'do/config:disable-word-wrap)
+(add-hook! org-mode #'do/config:disable-word-wrap-h)
+(add-hook! org-agenda-mode #'do/config:disable-word-wrap-h)
 #+end_src
 
 * +utilities
@@ -932,22 +932,22 @@ From the normal state:
 - Enter dired in the CWD of the current buffer's file with =-=
 
 #+begin_src elisp
-(defun do/config:keybindings:dired-jump ()
+(defun do/config:keybindings:dired-jump-h ()
   (map! :n "-" #'dired-jump))
-(add-hook! prog-mode #'do/config:keybindings:dired-jump)
-(add-hook! text-mode #'do/config:keybindings:dired-jump)
+(add-hook! prog-mode #'do/config:keybindings:dired-jump-h)
+(add-hook! text-mode #'do/config:keybindings:dired-jump-h)
 #+end_src
 
 From the normal state in dired mode:
 - Ensure quit with ZQ works
 
 #+begin_src elisp
-(defun do/config:keybindings:dired ()
+(defun do/config:keybindings:dired-h ()
   (map! :map dired-mode-map
         :n "Z q" #'evil-quit
         :localleader
         :n "," #'casual-dired-tmenu))
-(add-hook! dired-mode #'do/config:keybindings:dired)
+(add-hook! dired-mode #'do/config:keybindings:dired-h)
 #+end_src
 
 * evil
@@ -1017,12 +1017,12 @@ Enable some emacs chords in evil insert state:
 (map! :i "C-d" #'evil-delete-char
       :i "C-k" #'evil-delete-line)
 
-(defun do/config:keybindings:hybrid ()
+(defun do/config:keybindings:hybrid-h ()
   (map! :map (org-mode-map evil-org-mode-map)
         :i "C-d" nil
         :i "C-k" nil))
 
-(add-hook! org-mode :append #'do/config:keybindings:hybrid)
+(add-hook! org-mode :append #'do/config:keybindings:hybrid-h)
 #+end_src
 
 ** evil-cleverparens
@@ -1250,11 +1250,11 @@ Use =g~= operator to cycle through inflection transformations.
 ** Disable LSP
 
 #+begin_src elisp
-(defun do/config:flycheck-disable-lsp ()
+(defun do/config:flycheck-disable-lsp-h ()
   (setq flycheck-disabled-checkers '(lsp)))
-(add-hook! prog-mode #'do/config:flycheck-disable-lsp)
-(add-hook! text-mode #'do/config:flycheck-disable-lsp)
-(add-hook! org-mode #'do/config:flycheck-disable-lsp)
+(add-hook! prog-mode #'do/config:flycheck-disable-lsp-h)
+(add-hook! text-mode #'do/config:flycheck-disable-lsp-h)
+(add-hook! org-mode #'do/config:flycheck-disable-lsp-h)
 #+end_src
 
 * folding
@@ -1262,11 +1262,11 @@ Use =g~= operator to cycle through inflection transformations.
 Use tab to fold in prog modes.
 
 #+begin_src elisp
-(defun do/config:tab-to-fold-in-normal-state ()
+(defun do/config:tab-to-fold-in-normal-state-h ()
   "Bind toggle-fold function to the <tab> key."
   (evil-local-set-key 'normal (kbd "<tab>") #'evil-toggle-fold))
 
-(add-hook! prog-mode #'do/config:tab-to-fold-in-normal-state)
+(add-hook! prog-mode #'do/config:tab-to-fold-in-normal-state-h)
 #+end_src
 
 * formatting
@@ -1344,11 +1344,11 @@ If the prefix arg ARG is passed, delete the tags at project root."
 ** Formatting
 
 #+begin_src elisp
-(defun do/disable-formatting ()
+(defun do/config:disable-formatting-h ()
   (message "[apheleia] Disabling apheleia-mode.")
   (apheleia-mode -1))
-(add-hook! latex-mode #'do/disable-formatting)
-(add-hook! LaTeX-mode #'do/disable-formatting)
+(add-hook! latex-mode #'do/disable-formatting-h)
+(add-hook! LaTeX-mode #'do/disable-formatting-h)
 #+end_src
 
 #+begin_src elisp
@@ -1454,20 +1454,20 @@ If in an evil visual state, wrap the current selection in math mode."
 ** PDF auto-revert
 
 #+begin_src elisp
-(defun do/pdf:refresh-buffer-display ()
+(defun do/pdf:refresh-buffer-display-h ()
   "Refresh the display of the PDF buffer."
   (when (and (eq major-mode 'pdf-view-mode)
              (not (eq (current-buffer) (window-buffer (selected-window)))))
     (pdf-view-revert-buffer nil t)))
 
-(defun do/auto-revert-mode-pdf-view-refresh ()
+(defun do/auto-revert-mode-pdf-view-refresh-h ()
   "Enable auto-revert-mode and refresh display for PDF buffers."
-  (add-hook! auto-revert-mode #'do/pdf:refresh-buffer-display nil t))
+  (add-hook! auto-revert-mode #'do/pdf:refresh-buffer-display-h nil t))
 
 (setq auto-revert-interval 1)
 (setq auto-revert-verbose nil)
 
-(add-hook! pdf-view-mode #'do/auto-revert-mode-pdf-view-refresh)
+(add-hook! pdf-view-mode #'do/auto-revert-mode-pdf-view-refresh-h)
 (add-hook! pdf-view-mode #'auto-revert-mode)
 #+end_src
 
@@ -1802,7 +1802,7 @@ Don't use electric quotes
 Clear pre-installed keymaps and set cleaned up keymaps.
 
 #+begin_src elisp
-(defun do/config:keybindings:markdown ()
+(defun do/config:keybindings:markdown-h ()
   (defvar markdown-mode-style-map (make-sparse-keymap))
   (defvar markdown-mode-command-map (make-sparse-keymap))
   (defvar markdown-mode-map (make-sparse-keymap))
@@ -1863,7 +1863,7 @@ Clear pre-installed keymaps and set cleaned up keymaps.
 
 (after! markdown-mode
   (remove-hook! markdown-mode #'doom--enable-+javascript-npm-mode-in-markdown-mode-h)
-  (add-hook! markdown-mode :append #'do/config:keybindings:markdown))
+  (add-hook! markdown-mode :append #'do/config:keybindings:markdown-h))
 #+end_src
 
 ** =markdown-preview=: gfm-ish preview
@@ -2216,10 +2216,10 @@ nil)
 ** bullets
 
 #+begin_src elisp
-(defun do/config:display:org-bullets ()
+(defun do/config:display:org-bullets-h ()
   (org-bullets-mode +1))
 
-(add-hook! org-mode #'do/config:display:org-bullets)
+(add-hook! org-mode #'do/config:display:org-bullets-h)
 #+end_src
 
 ** display
@@ -2339,7 +2339,7 @@ Also sum the EFFORT of TODO children as REMAINING."
   (setq org-M-RET-may-split-line nil
         do/org:insert-heading-respect-content nil)
 
-  (defun do/config:keybindings:org-mode ()
+  (defun do/config:keybindings:org-mode-h ()
     (global-unset-key (kbd "s-RET"))
     (global-unset-key (kbd "s-<return>"))
 
@@ -2381,7 +2381,7 @@ Also sum the EFFORT of TODO children as REMAINING."
           :desc "toggle checkbox"            "x"  #'org-toggle-checkbox
           :desc "insert template"         :n "s" #'org-insert-structure-template))
 
-  (add-hook! org-mode :append #'do/config:keybindings:org-mode))
+  (add-hook! org-mode :append #'do/config:keybindings:org-mode-h))
 #+end_src
 
 ** file paths
@@ -3157,19 +3157,19 @@ Use =rjsx-mode= for React and React-TypeScript files.
 Use =C-RET= to expand emmet tags.
 
 #+begin_src elisp
-(defun do/config:keybindings:web ()
+(defun do/config:keybindings:web-h ()
   (map! :ni "C-<return>" #'emmet-expand-line))
 
-(add-hook! '(web-mode-hook rjsx-mode-hook) #'do/config:keybindings:web)
+(add-hook! '(web-mode-hook rjsx-mode-hook) #'do/config:keybindings:web-h)
 #+end_src
 
 Emmet should expand classes as =className= in JSX modes.
 
 #+begin_src elisp
-(defun do/config:emmet-expand-jsx-classname ()
+(defun do/config:emmet-expand-jsx-classname-h ()
   (setq emmet-expand-jsx-className? t))
 
-(add-hook! '(rjsx-mode-hook typescript-tsx-mode-hook) #'do/config:emmet-expand-jsx-classname)
+(add-hook! '(rjsx-mode-hook typescript-tsx-mode-hook) #'do/config:emmet-expand-jsx-classname-h)
 #+end_src
 
 * ruby
@@ -3179,7 +3179,7 @@ Emmet should expand classes as =className= in JSX modes.
 Set descriptions for prefixes and commands to aid discoverability.
 
 #+begin_src elisp
-(defun do/config:keybindings:ruby ()
+(defun do/config:keybindings:ruby-h ()
   (map! :localleader :map robe-mode-map "'" nil "h" nil "R" nil)
   (map! :localleader :map rubocop-mode-map "f" nil "F" nil "p" nil "P" nil)
   (map! :localleader :map ruby-mode-map "{" nil)
@@ -3202,12 +3202,12 @@ Set descriptions for prefixes and commands to aid discoverability.
          :desc "region & go"          "R"  #'ruby-send-region-and-go
          :desc "switch to inf"        "i"  #'ruby-switch-to-inf)))
 
-(add-hook! ruby-mode #'do/config:keybindings:ruby)
+(add-hook! ruby-mode #'do/config:keybindings:ruby-h)
 #+end_src
 
 #+begin_src elisp
 ;; clear projectile-rails's keybinds
-(defun do/config:keybindings:rails ()
+(defun do/config:keybindings:rails-h ()
   (map! :localleader :map projectile-rails-mode-map "r" nil)
   (map! :localleader
         :map ruby-mode-map
@@ -3266,7 +3266,7 @@ Set descriptions for prefixes and commands to aid discoverability.
         :desc "package"       "p" #'projectile-rails-goto-package))
   nil)
 
-(add-hook! ruby-mode #'do/config:keybindings:rails)
+(add-hook! ruby-mode #'do/config:keybindings:rails-h)
 #+end_src
 
 ** evil-rails
@@ -3323,7 +3323,7 @@ Unbind conflicting globally set keybindings.
 Unbind =rspec-mode= bindings and re-bind.
 
 #+begin_src elisp
-(defun do/config:keybindings:rspec ()
+(defun do/config:keybindings:rspec-h ()
   (map! :map (rspec-mode-map rspec-verifiable-mode-map)
         :localleader
         :prefix "t"
@@ -3362,7 +3362,7 @@ Unbind =rspec-mode= bindings and re-bind.
         :desc "single (test)" :n "T" #'ruby-test-run-at-point
         :desc "yank command"  :n "y" #'rspec-yank-last-command))
 
-(add-hook! ruby-mode #'do/config:keybindings:rspec)
+(add-hook! ruby-mode #'do/config:keybindings:rspec-h)
 #+end_src
 
 ** ruby-test
@@ -3523,9 +3523,9 @@ Look for a request spec if there's no controller spec."
 ** flycheck
 
 #+begin_src elisp
-(defun do/config:flycheck-set-checker-ruby ()
+(defun do/config:flycheck-set-checker-ruby-h ()
   (flycheck-select-checker 'ruby-rubocop))
-(add-hook! ruby-mode #'do/config:flycheck-set-checker-ruby)
+(add-hook! ruby-mode #'do/config:flycheck-set-checker-ruby-h)
 #+end_src
 
 * rust
@@ -3537,9 +3537,9 @@ Use tree-sitter.
 
 Use =rustc= for syntax checking.
 #+begin_src elisp
-(defun do/config:flycheck-set-checker-rust ()
+(defun do/config:flycheck-set-checker-rust-h ()
   (flycheck-select-checker 'rust))
-(add-hook! rust-ts-mode #'do/config:flycheck-set-checker-rust)
+(add-hook! rust-ts-mode #'do/config:flycheck-set-checker-rust-h)
 #+end_src
 
 * smartparens
@@ -3627,7 +3627,7 @@ Precedence order:
 ** xwidget-widget keybindings
 
 #+begin_src elisp
-(defun do/config:keybindings:xwidget-webkit ()
+(defun do/config:keybindings:xwidget-webkit-h ()
   "Configure xwidget keybindings."
   (evil-define-key*
     'normal xwidget-webkit-mode-map
@@ -3643,7 +3643,7 @@ Precedence order:
     "Y"  #'xwidget-webkit-current-url-message-kill))
 
 (evil-set-initial-state 'xwidget-webkit-mode 'normal)
-(add-hook! xwidget-webkit-mode #'do/config:keybindings:xwidget-webkit)
+(add-hook! xwidget-webkit-mode #'do/config:keybindings:xwidget-webkit-h)
 #+end_src
 
 ** smooth scrolling
@@ -3670,32 +3670,32 @@ Precedence order:
 * word chars
 
 #+begin_src elisp
-(defun do/config:add-dot-to-word-chars ()
+(defun do/config:add-dot-to-word-chars-h ()
   "Adds underscore to the word chars syntax entry list."
   (modify-syntax-entry ?. "w"))
 
-(defun do/config:add-underscore-to-word-chars ()
+(defun do/config:add-underscore-to-word-chars-h ()
   "Adds underscore to the word chars syntax entry list."
   (modify-syntax-entry ?_ "w"))
 
-(defun do/config:add-dash-to-word-chars ()
+(defun do/config:add-dash-to-word-chars-h ()
   "Adds underscore to the word chars syntax entry list."
   (modify-syntax-entry ?- "w"))
 
 (defun do/config:add-to-word-char-list ()
   "Customize the word char list in prog and other modes."
-  (add-hook! LaTeX-mode      #'do/config:add-dot-to-word-chars)
-  (add-hook! latex-mode      #'do/config:add-dot-to-word-chars)
-  (add-hook! coffee-mode     #'do/config:add-dash-to-word-chars)
-  (add-hook! coffee-mode     #'do/config:add-underscore-to-word-chars)
-  (add-hook! emacs-lisp-mode #'do/config:add-dash-to-word-chars)
-  (add-hook! markdown-mode   #'do/config:add-underscore-to-word-chars)
-  (add-hook! org-mode        #'do/config:add-underscore-to-word-chars)
-  (add-hook! prog-mode       #'do/config:add-dash-to-word-chars)
-  (add-hook! prog-mode       #'do/config:add-underscore-to-word-chars)
-  (add-hook! python-mode     #'do/config:add-underscore-to-word-chars)
-  (add-hook! restclient-mode #'do/config:add-underscore-to-word-chars)
-  (add-hook! text-mode       #'do/config:add-underscore-to-word-chars)
+  (add-hook! LaTeX-mode      #'do/config:add-dot-to-word-chars-h)
+  (add-hook! latex-mode      #'do/config:add-dot-to-word-chars-h)
+  (add-hook! coffee-mode     #'do/config:add-dash-to-word-chars-h)
+  (add-hook! coffee-mode     #'do/config:add-underscore-to-word-chars-h)
+  (add-hook! emacs-lisp-mode #'do/config:add-dash-to-word-chars-h)
+  (add-hook! markdown-mode   #'do/config:add-underscore-to-word-chars-h)
+  (add-hook! org-mode        #'do/config:add-underscore-to-word-chars-h)
+  (add-hook! prog-mode       #'do/config:add-dash-to-word-chars-h)
+  (add-hook! prog-mode       #'do/config:add-underscore-to-word-chars-h)
+  (add-hook! python-mode     #'do/config:add-underscore-to-word-chars-h)
+  (add-hook! restclient-mode #'do/config:add-underscore-to-word-chars-h)
+  (add-hook! text-mode       #'do/config:add-underscore-to-word-chars-h)
   nil)
 
 (do/config:add-to-word-char-list)
@@ -3720,10 +3720,10 @@ Precedence order:
 Open on main org todo doc.
 
 #+begin_src elisp :tangle no
-(defun do/workspace:open-org-todos ()
+(defun do/workspace:open-org-todos-h ()
   "Open the main Org mode file in the main workspace."
   (find-file (format "%s/%s" (getenv "ORG_HOME") +org-capture-todo-file)))
-(add-hook! emacs-startup #'do/workspace:open-org-todos)
+(add-hook! emacs-startup #'do/workspace:open-org-todos-h)
 #+end_src
 
 Open on an empty buffer in the main workspace.
