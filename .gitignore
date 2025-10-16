@@ -80,6 +80,7 @@ state
 /config/configstore/update-notifier-gatsby-cli.json
 /config/configstore/update-notifier-npm.json
 /config/cups/
+/config/cursor/
 /config/docker/*
 /config/doom/config.el
 /config/exercism
