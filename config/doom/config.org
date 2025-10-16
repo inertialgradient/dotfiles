@@ -2407,6 +2407,84 @@ Also sum the EFFORT of TODO children as REMAINING."
    'tree))
 #+end_src
 
+*** modify timestamps under point
+#+begin_src elisp
+(defun do/org:at-entry-point ()
+  "Return the marker for the entry point, handling both org-mode and org-agenda-mode."
+  (if (derived-mode-p 'org-agenda-mode)
+      (org-get-at-bol 'org-marker)
+    (point-marker)))
+#+end_src
+
+#+begin_src elisp
+(defun do/org:clear-timestamp-time (prop)
+  "Remove the time portion from the timestamp in PROP (\"SCHEDULED\" or \"DEADLINE\").
+Works in both org-mode and org-agenda-mode."
+  (let* ((agenda-p (derived-mode-p 'org-agenda-mode))
+         (orig-buf (current-buffer))
+         (marker (do/org:at-entry-point))
+         (buf (marker-buffer marker)))
+    (with-current-buffer buf
+      (goto-char marker)
+      (let ((ts-str (org-entry-get nil prop)))
+        (when ts-str
+          (when (org-timestamp-has-time-p (org-timestamp-from-string ts-str))
+            (let* ((ts (org-timestamp-from-string ts-str))
+                   (ts-props (cadr ts))
+                   (new-props (copy-alist ts-props)))
+              (dolist (key '(:hour-start :minute-start :hour-end :minute-end))
+                (setq new-props (plist-put new-props key nil)))
+              ;; Check if it's a same-day range and collapse if so
+              (when (and (plist-get new-props :year-end)
+                         (= (plist-get new-props :year-start) (plist-get new-props :year-end))
+                         (= (plist-get new-props :month-start) (plist-get new-props :month-end))
+                         (= (plist-get new-props :day-start) (plist-get new-props :day-end)))
+                (dolist (key '(:year-end :month-end :day-end :hour-end :minute-end))
+                  (setq new-props (plist-put new-props key nil)))
+                (let ((orig-type (plist-get new-props :type)))
+                  (cond ((eq orig-type 'active-range)
+                         (setq new-props (plist-put new-props :type 'active)))
+                        ((eq orig-type 'inactive-range)
+                         (setq new-props (plist-put new-props :type 'inactive)))))
+                (setq new-props (plist-put new-props :range-type nil)))
+              (let ((new-ts `(timestamp ,new-props)))
+                (org-entry-put nil prop (org-element-interpret-data new-ts))))))))
+    (when agenda-p
+      (with-current-buffer orig-buf
+        (org-agenda-redo t)))))
+#+end_src
+
+#+begin_src elisp
+(defun do/org:clear-timestamp (prop)
+  "Remove the entire timestamp in PROP (\"SCHEDULED\" or \"DEADLINE\").
+Works in both org-mode and org-agenda-mode."
+  (let* ((agenda-p (derived-mode-p 'org-agenda-mode))
+         (orig-buf (current-buffer))
+         (marker (do/org:at-entry-point))
+         (buf (marker-buffer marker)))
+    (with-current-buffer buf
+      (goto-char marker)
+      (org-entry-put nil prop nil))
+    (when agenda-p
+      (with-current-buffer orig-buf
+        (org-agenda-redo t)))))
+#+end_src
+
+#+begin_src elisp
+(defun do/org:clear-scheduled-time () (interactive) (do/org:clear-timestamp-time "SCHEDULED"))
+(defun do/org:clear-deadline-time () (interactive) (do/org:clear-timestamp-time "DEADLINE"))
+(defun do/org:clear-scheduled () (interactive) (do/org:clear-timestamp "SCHEDULED"))
+(defun do/org:clear-deadline () (interactive) (do/org:clear-timestamp "DEADLINE"))
+(after! org-agenda
+  (map! :map (org-mode-map org-agenda-mode-map)
+        :localleader
+        :prefix ("d c" . "clear-timestamp")
+        "d" #'do/org:clear-deadline-time
+        "s" #'do/org:clear-scheduled-time
+        "D" #'do/org:clear-deadline
+        "S" #'do/org:clear-scheduled))
+#+end_src
+
 ** keybindings
 
 #+begin_src elisp
