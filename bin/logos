@@ -91,7 +91,7 @@ tail_logs() {
   fi
 }
 
-cd "${HOME}/Writing/logos"
+cd "${HOME}/Writing/logos_ex_machina"
 
 case "${SUBCOMMAND}" in
   deploy)
