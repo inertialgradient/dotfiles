@@ -2505,10 +2505,10 @@ Works in both org-mode and org-agenda-mode."
           :ni "C-s-u"        #'outline-up-heading
           :ni "C-s-p"        #'org-backward-heading-same-level
           :ni "C-s-n"        #'org-forward-heading-same-level
-          ;; :ni "s-RET"        #'do/org:insert-heading-below
-          ;; :ni "s-<return>"   #'do/org:insert-heading-below
-          ;; :ni "s-S-RET"      #'do/org:insert-heading-above
-          ;; :ni "s-S-<return>" #'do/org:insert-heading-above
+          :ni "s-RET"        #'do/org:insert-heading-below
+          :ni "s-<return>"   #'do/org:insert-heading-below
+          :ni "s-S-RET"      #'do/org:insert-heading-above
+          :ni "s-S-<return>" #'do/org:insert-heading-above
           :ni "C-s-RET"      #'do/org:insert-subheading-below
           :ni "C-s-<return>" #'do/org:insert-subheading-below
           :nvi "s-b" #'do/text:make-bold
