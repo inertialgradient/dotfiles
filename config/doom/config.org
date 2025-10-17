@@ -2631,7 +2631,8 @@ Open capture modal with C-SPC
            :prepend t)
           ("j" "Journal" entry
            (file+olp+datetree +org-capture-journal-file)
-           "* %U %?\n%i\n%a"
+           "* %U %?\n%i"
+           :tree-type month
            :empty-lines-after 1
            :prepend t)
           ("l" "Link" entry
