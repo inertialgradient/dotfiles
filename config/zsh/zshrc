@@ -467,6 +467,11 @@ fpath=(
 autoload -Uz compinit
 compinit
 
+zstyle ':completion:*' menu select
+zstyle ':completion:*:default' list-colors \
+  'no=0;38;2;92;99;112:fi=0;38;2;92;99;112:cmd=0;38;2;92;99;112:ex=0;38;2;92;99;112:ln=0;38;2;92;99;112:di=0;38;2;92;99;112:ma=0;38;2;150;150;150:mh=0;38;2;92;99;112'
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#5c6370'
+
 compdef g=git               # Complete 'g' as git
 setopt complete_aliases     # Complete aliased commands
 
