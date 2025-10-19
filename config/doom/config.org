@@ -2132,7 +2132,7 @@ Compact keymap wrappers
         org-agenda-skip-deadline-if-done t
         org-agenda-skip-deadline-prewarning-if-scheduled t
         org-agenda-skip-scheduled-if-done t
-        org-agenda-span 7
+        org-agenda-span 9
         org-agenda-start-day "-1d"
         org-agenda-start-on-weekday nil
         org-agenda-start-with-log-mode t
