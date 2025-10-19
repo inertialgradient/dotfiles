@@ -31,6 +31,8 @@
 ;; (package! aider :recipe (:host github :repo "tninja/aider.el" :files ("aider*.el")))
 (package! copilot :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
 (package! copilot-chat :recipe (:host github :repo "chep/copilot-chat.el" :files ("*.el")))
+;; (package! ggtags :recipe (:host github :repo "leoliu/ggtags"))
+;; (package! gxref :recipe (:host github :repo "dedi/gxref"))
 (package! seeing-is-believing) ;; evaluate expressions as a comment
 (package! typopunct) ;; insert en/em dashes, curly quotes
 (package! yankee :recipe (:host github :repo "inertialgradient/yankee.el" :files ("yankee.el")))

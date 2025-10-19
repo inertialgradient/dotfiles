@@ -1290,28 +1290,28 @@ Disable LSP formatting
 
 * gtags
 
-** gxref
+** gxref (disabled)
 
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setq xref-backend-functions '(elisp--xref-backend etags--xref-backend))
 (add-to-list 'xref-backend-functions #'gxref-xref-backend)
 #+end_src
 
-** ggtags
+** ggtags (disabled)
 
 https://github.com/leoliu/ggtags
 
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (after! ggtags
   (ggtags-mode)
   (add-to-list 'xref-backend-functions #'ggtags-xref-backend))
 #+end_src
 
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (setq projectile-tags-command "global -u")
 #+end_src
 
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (defun do/project-gtags-refresh (arg)
   "Refresh the tags at project root, building tag files if in a project.
 If the prefix arg ARG is passed, delete the tags at project root."
