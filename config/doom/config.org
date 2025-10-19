@@ -2373,29 +2373,6 @@ nil)
      nil 'tree)))
 #+end_src
 
-*** sum effort in subtree
-#+begin_src elisp
-(defun do/org:sum-effort-in-subtree ()
-  "Sum the EFFORT of all children and set as parent's EFFORT.
-Also sum the EFFORT of TODO children as REMAINING."
-  (interactive)
-  (save-excursion
-    (let ((total 0)
-          (total-remaining 0))
-      ;; Map over all entries in the subtree
-      (org-map-entries (lambda ()
-                         (let ((effort (org-entry-get (point) "EFFORT")))
-                           (when effort
-                             (let ((mins (org-duration-string-to-minutes effort)))
-                               (setq total (+ total (floor mins 1)))
-                               ;; Check if the entry is a TODO item
-                               (when (member (org-get-todo-state) org-not-done-keywords)
-                                 (setq total-remaining (+ total-remaining (floor mins 1)))))))
-                         nil 'tree))
-      (org-entry-put (point) "EFFORT" (do/minutes-to-duration total))
-      (org-entry-put (point) "REMAINING" (do/minutes-to-duration total-remaining)))))
-#+end_src
-
 *** bulk-add effot to subtree
 #+begin_src elisp
 (defun do/org:set-effort-on-subtree (effort)
