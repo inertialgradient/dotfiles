@@ -118,7 +118,7 @@
  (org +dragndrop +roam2 +appear +noter +hugo +journal)
  ;;php
  ;;plantuml
- (python +lsp +pyright +pyenv +poetry)
+ (python +lsp +pyright)
  rest
  (ruby +rails)
  (rust +lsp)
