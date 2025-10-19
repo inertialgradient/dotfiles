@@ -101,6 +101,8 @@ state
 /config/zsh/.zsh_sessions
 
 /config/.gsd-keyboard.settings-ported
+/config/GNOME-xdg-terminals.list
+/config/NVIDIA/
 /config/autostart/
 /config/dconf/
 /config/evolution/
@@ -108,17 +110,22 @@ state
 /config/gnome-control-center/
 /config/gnome-initial-setup-done
 /config/gtk-3.0/
+/config/ibus-mozc-gnome-initial-setup-done
 /config/ibus/
 /config/mimeapps.list
 /config/monitors.xml
+/config/mozc/
 /config/nautilus/
+/config/nvidia-ai-workbench/
 /config/pop-shell/
 /config/pop-system-updater/
 /config/pulse/
 /config/qalculate/qalc.history
 /config/systemd/
+/config/tiling-assistant/
 /config/toshy/*
 /config/touchegg/
+/config/ubuntu-xdg-terminals.list
 /config/ulauncher/
 /config/user-dirs.dirs
 /config/user-dirs.locale
