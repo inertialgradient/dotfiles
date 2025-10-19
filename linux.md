@@ -87,7 +87,7 @@ wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
 
 zcat < install-tl-unx.tar.gz | tar xf -
 
-perl ./install-tl --no-interaction --paper=letter --no-doc-install --no-src-install to install-tl
+sudo ./install-tl --no-interaction --paper=letter --no-doc-install --no-src-install
 
 sudo ln -s /usr/local/texlive/[YYYY] /usr/local/texlive/current
 ```
