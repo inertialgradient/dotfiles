@@ -3,10 +3,15 @@
 1. Pop! Shop: Install dropbox
 2. Command-line installations
 
+
+# sudo ubuntu-drivers autoinstall
+# sudo apt install nvidia-cuda-toolkit ruby vim zsh xclip gnome-tweaks gnome-sushi
 ```
 echo ------- apt ---------
-sudo ubuntu-drivers autoinstall
-sudo apt install nvidia-cuda-toolkit ruby vim zsh xclip gnome-tweaks gnome-sushi
+sudo apt install ruby zsh xclip flatpak tmux
+
+echo ------- zsh ---------
+chsh -s $(which zsh) $USER
 
 echo ------- emacs ---------
 brew unlink emacs
@@ -22,13 +27,21 @@ bash -c "$(curl -L https://raw.githubusercontent.com/RedBearAK/toshy/main/script
 
 echo ------- vim ---------
 sudo apt-get install libx11-dev libxt-dev libxpm-dev libgtk2.0-dev
-brew install --build-from-source ~/.dotfiles/scripts/vim.rb
+brew tap inertialgradient/vim
+# copy formula to tap directory
+# brew install --build-from-source [TAP DIRECTORY]
 
 echo ------- kitty ---------
 ~/.dotfiles/lib/install-kitty
 
 echo ------- flatpak ---------
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install brave extensionmanager
+
+echo ------- fonts ---------
+mkdir ~/.local/share/fonts
+cp -r ~/Dropbox/fonts/**/* ~/.local/share/fonts
+fc-cache -fv
 ```
 
 ## Merge config and data home dirs
@@ -62,7 +75,7 @@ Locate and edit the COSMIC extension's main JavaScript file, often named
 The path is likely
 
 ```
-/usr/share/gnome-shell/extensions/pop-cosmic@system76.com/extension.js 
+/usr/share/gnome-shell/extensions/pop-cosmic@system76.com/extension.js
 ```
 
 Search for this line and comment it out:
