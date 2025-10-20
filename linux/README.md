@@ -7,7 +7,7 @@
 # sudo apt install nvidia-cuda-toolkit
 ```
 echo ------- apt ---------
-sudo apt install ruby zsh xclip flatpak tmux gnome-tweaks gnome-sushi
+sudo apt install ruby zsh xclip flatpak tmux gnome-tweaks gnome-sushi trash-cli
 
 echo ------- zsh ---------
 chsh -s $(which zsh) $USER
