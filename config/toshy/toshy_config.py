@@ -823,6 +823,10 @@ keymap("[Custom] Chromium-based Browsers", {
     C("RC-y"):                  C("C-H"),                       # Browser History
     C("Alt-RC-u"):              C("C-U"),                       # View Page Source
     C("Shift-RC-j"):            C("C-J"),                       # Show Downloads view
+
+    C("RC-x"):                  C("C-x"),                       # Cut
+    C("RC-c"):                  C("C-c"),                       # Copy
+    C("RC-v"):                  C("C-v"),                       # Paste
 }, when = lambda ctx:
     cnfg.screen_has_focus and
     matchProps(clas=browsers_chromeStr)(ctx) )
