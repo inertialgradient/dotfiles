@@ -1,14 +1,13 @@
 ## Steps to add to the bootstrap
 
-1. Pop! Shop: Install dropbox
+1. Pop! Shop: Install dropbox (if on Pop OS)
 2. Command-line installations
 
-
 # sudo ubuntu-drivers autoinstall
-# sudo apt install nvidia-cuda-toolkit ruby vim zsh xclip gnome-tweaks gnome-sushi
+# sudo apt install nvidia-cuda-toolkit
 ```
 echo ------- apt ---------
-sudo apt install ruby zsh xclip flatpak tmux
+sudo apt install ruby zsh xclip flatpak tmux gnome-tweaks gnome-sushi
 
 echo ------- zsh ---------
 chsh -s $(which zsh) $USER
