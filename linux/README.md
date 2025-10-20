@@ -85,7 +85,14 @@ dconf dump /org/gnome/ > gnome-keybindings-backup.conf
 ~ % gsettings get org.gnome.shell.keybindings toggle-overview
 @as []
 ~ % gsettings get org.gnome.mutter overlay-key
-''                                                                                                                                                                                                                                                                                                                                               gs~ % g co -- config/toshy/toshy_config.py
+''
+```
+
+```
+gsettings set org.gnome.shell.extensions.dash-to-dock hot-keys false
+for i in {1..9}; do
+  gsettings set org.gnome.shell.keybindings switch-to-application-$i "[]"
+done
 ```
 
 #### PopOS
