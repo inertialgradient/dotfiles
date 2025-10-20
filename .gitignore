@@ -112,6 +112,7 @@ state
 /config/gtk-3.0/
 /config/ibus-mozc-gnome-initial-setup-done
 /config/ibus/
+/config/maestral/
 /config/mimeapps.list
 /config/monitors.xml
 /config/mozc/

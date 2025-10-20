@@ -1,6 +1,6 @@
 ## Steps to add to the bootstrap
 
-1. Pop! Shop: Install dropbox (if on Pop OS)
+1. Install maestral `pip install maestral`, `maestral start`
 2. Command-line installations
 
 # sudo ubuntu-drivers autoinstall
