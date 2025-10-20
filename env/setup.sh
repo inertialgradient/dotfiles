@@ -48,6 +48,11 @@ source "${DOTFILES_DIR}/env/xdg.apps.sh"
 
 if [[ "${MACHINE}" == "apple" ]]; then
   source "${DOTFILES_DIR}/env/build.sh"
+else
+  export LDFLAGS="-L/home/linuxbrew/.linuxbrew/lib"
+  export CPPFLAGS="-I/home/linuxbrew/.linuxbrew/include"
+  export LD_LIBRARY_PATH="/home/linuxbrew/.linuxbrew/lib"
+  export PKG_CONFIG_PATH="/home/linuxbrew/.linuxbrew/lib/pkgconfig"
 fi
 
 source "${DOTFILES_DIR}/env/bundler.sh"

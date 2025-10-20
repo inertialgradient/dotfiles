@@ -1,0 +1,17 @@
+#!/bin/bash
+
+sudo apt update
+sudo apt build-dep -y emacs
+sudo apt install -y libgtk-3-dev libjansson-dev libtree-sitter-dev libgccjit-10-dev git libglib2.0-dev pkg-config
+cd /opt
+
+sudo mkdir emacs && sudo chown $USER:$USER emacs
+cd emacs
+
+git clone --jobs$(nproc) --depth 1 --branch emacs-30 https://github.com/emacs-mirror/emacs.git
+cd emacs
+
+./autogen.sh
+./configure --with-tree-sitter --with-native-compilation --without-rsvg --with-x-toolkit=gtk3
+make -j$(nproc)
+sudo make install
