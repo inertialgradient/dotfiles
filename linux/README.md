@@ -62,11 +62,33 @@ Accessibility > Keyboard
 
 ## Keybinding config
 
+### Load
+
 ```
-cat keybindings.conf | dconf load /
+dconf load /org/gnome/ < gnome-keybindings-backup.conf
+```
+
+### Save
+
+```
+dconf dump /org/gnome/ > gnome-keybindings-backup.conf
 ```
 
 ### Disable standalone super key
+
+#### Ubuntu
+
+```
+~ % gsettings set org.gnome.shell.keybindings toggle-overview "[]"
+~ % gsettings set org.gnome.mutter overlay-key ''
+
+~ % gsettings get org.gnome.shell.keybindings toggle-overview
+@as []
+~ % gsettings get org.gnome.mutter overlay-key
+''                                                                                                                                                                                                                                                                                                                                               gs~ % g co -- config/toshy/toshy_config.py
+```
+
+#### PopOS
 
 Locate and edit the COSMIC extension's main JavaScript file, often named
 `extension.js`.
