@@ -2594,23 +2594,19 @@ Open capture modal with C-SPC
         '(("t" "Todo" entry
            (file+headline +org-capture-todo-file "Inbox")
            "* TODO %?\n%i\n%a"
-           :empty-lines-after 1
            :prepend t)
           ("d" "Yak Shave" entry
            (file+olp +org-capture-projects-central-file-path ".dotfiles" "Tasks")
            "* TODO %?\n%i\n%a"
-           :empty-lines-after 1
            :prepend t)
           ("n" "Notes" entry
            (file+headline +org-capture-notes-file "Inbox")
            "* %?\n%i\n%a"
-           :empty-lines-after 1
            :prepend t)
           ("j" "Journal" entry
            (file+olp+datetree +org-capture-journal-file)
            "* %U %?\n%i"
            :tree-type month
-           :empty-lines-after 1
            :prepend t)
           ("l" "Link" entry
            (file+headline +org-capture-links-file-path "Inbox")
@@ -2656,17 +2652,14 @@ Open capture modal with C-SPC
           ("pt" "Project-local todo" entry
            (file+headline +org-capture-project-todo-file "Inbox")
            "* TODO %?\n%i\n%a"
-           :empty-lines-after 1
            :prepend t)
           ("pn" "Project-local notes" entry
            (file+headline +org-capture-project-notes-file "Inbox")
            "* %?\n%i\n%a"
-           :empty-lines-after 1
            :prepend t)
           ("pc" "Project-local changelog" entry
            (file+headline +org-capture-project-changelog-file "Unreleased")
            "* %u %?\n%i\n%a"
-           :empty-lines-after 1
            :prepend t)
 
           ;; Will use {org-directory}/{+org-capture-projects-file} and store
@@ -2678,13 +2671,11 @@ Open capture modal with C-SPC
            (function +org-capture-central-project-todo-file)
            "* TODO %?\n %i\n %a"
            :heading "Tasks"
-           :empty-lines-after 1
            :prepend t)
           ("Pn" "notes" entry
            (function +org-capture-central-project-notes-file)
            "* %?\n %i\n %a"
            :heading "Notes"
-           :empty-lines-after 1
            :prepend t)
           ("Pc" "changelog" entry
            (function +org-capture-central-project-changelog-file)
