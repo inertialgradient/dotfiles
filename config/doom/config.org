@@ -1347,8 +1347,8 @@ If the prefix arg ARG is passed, delete the tags at project root."
 (defun do/config:disable-formatting-h ()
   (message "[apheleia] Disabling apheleia-mode.")
   (apheleia-mode -1))
-(add-hook! latex-mode #'do/disable-formatting-h)
-(add-hook! LaTeX-mode #'do/disable-formatting-h)
+(add-hook! latex-mode #'do/config:disable-formatting-h)
+(add-hook! LaTeX-mode #'do/config:disable-formatting-h)
 #+end_src
 
 #+begin_src elisp
