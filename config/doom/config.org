@@ -2373,7 +2373,7 @@ nil)
      nil 'tree)))
 #+end_src
 
-*** bulk-add effot to subtree
+*** bulk-add effort to subtree
 #+begin_src elisp
 (defun do/org:set-effort-on-subtree (effort)
   "Bulk set EFFORT property on all subheadings of the current tree."
@@ -2383,7 +2383,31 @@ nil)
    nil
    'tree))
 #+end_src
+*** sum effort from subtree
+#+begin_src elisp
+(defun do/org:sum-effort-from-subtree ()
+  "Sum the Effort estimates of all child headings one level below the current heading,
+and store the total Effort in the current heading's property drawer.
 
+Effort values are assumed to be in standard Org time format, e.g., \"0:30\" or \"2:15\"."
+  (interactive)
+  (require 'org-duration)
+  (save-excursion
+    (org-back-to-heading t)
+    (let* ((current-level (org-current-level))
+           (sum 0))
+      ;; Iterate through all subheadings of current heading
+      (org-map-entries
+       (lambda ()
+         (when (= (org-current-level) (1+ current-level))
+           (let ((effort (org-entry-get (point) "Effort")))
+             (when effort
+               (setq sum (+ sum (org-duration-to-minutes effort)))))))
+       nil 'tree)
+      ;; Write summed effort back to current heading as Org time string
+      (org-entry-put (point) "Effort" (org-duration-from-minutes sum))
+      (message "Set Effort to %s" (org-duration-from-minutes sum)))))
+#+end_src
 *** modify timestamps under point
 #+begin_src elisp
 (defun do/org:at-entry-point ()
