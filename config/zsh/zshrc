@@ -179,7 +179,8 @@ git_branch() {
 }
 
 gitstatus_prompt() {
-  PROMPT="$(color blue)%c$(color reset) "
+  PROMPT=${SSH_CONNECTION:+$(color gray)%n@%m$(color reset)$'\n'}
+  PROMPT+="$(color blue)%c$(color reset) "
 
   if gitstatus_query MY && [[ ${VCS_STATUS_RESULT} == ok-sync ]]; then
     if (( VCS_STATUS_HAS_CONFLICTED )); then
@@ -425,6 +426,7 @@ color() {
     violet) printf "%s" "%{${fg_no_bold[magenta]}%}" ;;
     blue)   printf "%s" "%{${fg_no_bold[blue]}%}" ;;
     white)  printf "%s" "%{${fg_no_bold[white]}%}" ;;
+    gray)   printf "%s" "%{${fg_no_bold[gray]}%}" ;;
     reset)  printf "%s" "%{${reset_color}%}" ;;
   esac
 }
