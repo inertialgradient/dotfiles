@@ -31,6 +31,7 @@ PATH+=":${HOMEBREW_PREFIX}/bin"
 PATH+=":${HOMEBREW_PREFIX}/sbin"
 
 PATH+=":${HOME}/.local/bin"
+PATH+=":/usr/local/cuda/bin"
 PATH+=":/usr/local/sbin"
 PATH+=":/usr/local/bin"
 PATH+=":/usr/sbin"
