@@ -192,6 +192,7 @@ if machine_is?(:apple)
     brew_install :defaultbrowser
     brew_install :exercism
     brew_install :llm
+    cask_install :lm_studio
     cask_install :ollama_app
 
     brew_tap "yt-dlp/taps"
