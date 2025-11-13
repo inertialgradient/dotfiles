@@ -217,6 +217,10 @@ def post_install_emacs_plus(version: 30)
   SH
 end
 
+def disable_press_and_hold
+  execho("defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false")
+end
+
 # Homebrew-related commands
 # -------------------------
 

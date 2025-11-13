@@ -7,6 +7,7 @@ require_relative "../lib/bootstrap"
 ensure_xcode_is_set_up
 ensure_gpg_permissions_are_set_correctly
 ensure_locals_are_created
+disable_press_and_hold
 
 setup :xdg_base_directory_environment do
   install_launchagent "com.tensorconclave.xdg"
