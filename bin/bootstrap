@@ -118,10 +118,8 @@ setup :text_editing_cli_tools do
 end
 
 if machine_is?(:apple)
-  setup :emacs_plus do
-    brew_tap "d12frosted/emacs-plus"
+  setup_emacs_plus(version: 30) do
     brew_install :emacs_plus, options: %i[with_compress_install with_imagemagick with_xwidgets]
-    post_install_emacs_plus
   end
 
   setup :emacs_mac, default: false do
@@ -138,21 +136,26 @@ if machine_is?(:apple)
   end
 
   setup :mac_tools do
+
     brew_install :colima
     brew_install :osxutils
     brew_install :pinentry_mac
     brew_install :reattach_to_user_namespace
     brew_install :trash
     brew_install :vim
+    cask_install :daisydisk
     cask_install :karabiner_elements
+    cask_install :lm_studio
     cask_install :marked_app
+    cask_install :ollama_app
+    cask_install :the_clock
     cask_install :visual_studio_code
     cask_install :zed
+
   end
 
   setup :gui_apps do
 
-    cask_install :alacritty
     cask_install :appcleaner
     cask_install :betterdisplay
     cask_install :bettertouchtool
@@ -193,8 +196,6 @@ if machine_is?(:apple)
     brew_install :defaultbrowser
     brew_install :exercism
     brew_install :llm
-    cask_install :lm_studio
-    cask_install :ollama_app
 
     brew_tap "yt-dlp/taps"
     brew_install :yt_dlp

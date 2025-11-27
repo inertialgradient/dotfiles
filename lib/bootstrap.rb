@@ -211,10 +211,15 @@ def ensure_locals_are_created
   end
 end
 
-def post_install_emacs_plus(version: 30)
-  execho <<~SH
-    osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@#{version}/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
-  SH
+def setup_emacs_plus(version: 30)
+  setup :emacs_plus do
+    execho "brew unlink emacs"
+    brew_tap "d12frosted/emacs-plus"
+    yield
+    execho <<~SH
+      osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@#{version}/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
+    SH
+  end
 end
 
 def disable_press_and_hold
