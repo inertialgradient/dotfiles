@@ -1,7 +1,6 @@
 autoflake
 autopep8
 cookiecutter
-fastapi
 importmagic
 ipdb
 ipython
@@ -14,16 +13,14 @@ nose
 openai
 pip
 pipenv
-poetry
 pycodestyle
 pydocstyle
-pyflakes
 pyflakes
 pylint
 pyright
 pytest
-python-language-server
 rope
 rstfmt
 ruff
+uv
 virtualenv
