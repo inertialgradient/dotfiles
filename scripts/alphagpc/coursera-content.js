@@ -86,34 +86,40 @@ function saveTextAsDownload(filename, text) {
 }
 
 function handleClick(e) {
+  // Prevent multiple clicks
+  if (e.target.disabled) return;
+  e.target.disabled = true;
+  e.target.textContent = "Processing...";
+
   // ensure all lessons are expanded
   document
     .querySelectorAll("h3 button[aria-expanded=false]")
     .forEach((e) => e.click());
 
-  const observer = new MutationObserver(async (mutations, obs) => {
-    DEBUG && console.log("DOM has been updated after all clicks.");
+  // Use setTimeout instead of MutationObserver for more reliability
+  setTimeout(async () => {
+    try {
+      DEBUG && console.log("DOM has settled after expanding lessons.");
 
-    // Replace or append to clipboard with generated commands
-    const clipboardText = await navigator.clipboard.readText();
-    const command = generateDownloadCommand(e);
-    const script = /wget/.test(clipboardText)
-      ? [clipboardText, command].join("\n")
-      : command;
-    console.log(script);
-    navigator.clipboard.writeText(script);
+      const clipboardText = await navigator.clipboard.readText();
+      const command = generateDownloadCommand(e);
+      const script = /wget/.test(clipboardText)
+        ? [clipboardText, command].join("\n")
+        : command;
+      console.log(script);
+      await navigator.clipboard.writeText(script);
 
-    console.log("Advancing to next page...");
-    // Advance to next page
-    const nextButton = document.querySelector('button[aria-label="Go to next item"]');
-    if (nextButton) {
-      nextButton.click();
+      console.log("Advancing to next page...");
+      const nextButton = document.querySelector('button[aria-label="Go to next item"]');
+      if (nextButton) {
+        nextButton.click();
+      }
+    } catch (error) {
+      console.error("Error processing download:", error);
+      e.target.disabled = false;
+      e.target.textContent = "Download";
     }
-
-    obs.disconnect(); // Stop observing after first batch of changes
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
+  }, 1000); // Give DOM time to settle after expanding lessons
 }
 
 const toggleDownloads = () => {
