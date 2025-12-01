@@ -1,93 +1,110 @@
-#!/usr/bin/env python3
+#!/usr/bin/env bash
+#
+# git-commit-generator — Generate a Git commit message from staged changes using OpenAI
+#
+# Usage: git cmg
+#
+# Requires:
+#   - OPENAI_API_KEY_GIT environment variable
+#   - jq
+#
+# Uses the modern OpenAI Responses API (2025).
 
-import subprocess
-import requests
-import sys
+set -euo pipefail
 
+# --- sanity checks ------------------------------------------------------------
 
-def get_git_diff():
-    """Get the git diff of staged changes"""
-    try:
-        diff = subprocess.check_output(["git", "diff", "--cached"], text=True)
-        if not diff:
-            print("No staged changes found. Stage your changes with 'git add' first.")
-            sys.exit(1)
-        return diff
-    except subprocess.CalledProcessError as e:
-        print(f"Error getting git diff: {e}")
-        sys.exit(1)
+if ! command -v jq >/dev/null 2>&1; then
+  echo "Error: jq is required." >&2
+  exit 1
+fi
 
+if [ -z "${OPENAI_API_KEY_GIT:-}" ]; then
+  echo "Error: OPENAI_API_KEY_GIT is not set." >&2
+  exit 1
+fi
 
-def generate_commit_message(diff, model="deepseek-r1:1.5b"):
-    """Generate a commit message using Ollama"""
-    prompt = f"""Generate a concise and descriptive git commit message for the following changes.
-Follow these guidelines:
-- Use the imperative mood ("Add" not "Added")
-- Keep the first line under 50 characters
-- Provide a more detailed description after a blank line if needed
-- Focus on WHY and WHAT, not HOW
+# --- read staged diff ---------------------------------------------------------
 
-Changes:
-{diff}
-"""
-    try:
-        response = requests.post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": model,
-                "prompt": prompt,
-                "system": "You are a helpful assistant who writes clear and concise git commit messages.",
-                "stream": False,
-            },
-        )
-        response.raise_for_status()
-        return response.json()["response"].strip()
-    except requests.exceptions.RequestException as e:
-        print(f"Error connecting to Ollama: {e}")
-        print("Make sure Ollama is running (ollama serve)")
-        sys.exit(1)
+diff_output="$(git diff --cached)"
 
+if [ -z "$diff_output" ]; then
+  echo "Error: no staged changes." >&2
+  exit 1
+fi
 
-def main():
-    # Check if Ollama is running
-    try:
-        requests.get("http://localhost:11434/api/tags")
-    except requests.exceptions.ConnectionError:
-        print(
-            "Error: Cannot connect to Ollama. Make sure it's running with 'ollama serve'"
-        )
-        sys.exit(1)
+# --- prepare prompt -----------------------------------------------------------
 
-    # Get the diff
-    diff = get_git_diff()
+prompt=$(cat <<EOF
+Generate a Git commit message for the following staged diff.
 
-    # Generate commit message
-    commit_message = generate_commit_message(diff)
+Rules:
+- Subject line ≤50 characters.
+- Blank line after subject.
+- Short descriptive body (1–4 sentences).
+- No chain-of-thought or explanation.
+- Output ONLY the commit message.
 
-    # Print the generated message
-    print("\nGenerated commit message:\n")
-    print(commit_message)
+Diff:
+$diff_output
+EOF
+)
 
-    # Ask user if they want to use this message
-    while True:
-        choice = input("\nDo you want to use this commit message? [Y/n/r]: ").lower()
-        if choice in ["", "y", "yes"]:
-            try:
-                subprocess.run(["git", "commit", "-m", commit_message], check=True)
-                print("Changes committed successfully!")
-            except subprocess.CalledProcessError as e:
-                print(f"Error making commit: {e}")
-            break
-        elif choice in ["n", "no"]:
-            print("Commit aborted.")
-            break
-        elif choice == "r":
-            print("\nGenerating new message...\n")
-            commit_message = generate_commit_message(diff)
-            print(commit_message)
-        else:
-            print("Please enter 'y' (yes), 'n' (no), or 'r' (regenerate)")
+# --- call OpenAI API ----------------------------------------------------------
 
+payload=$(jq -n --arg input "$prompt" '
+{
+  model: "gpt-4.1-mini",
+  input: $input,
+  temperature: 0.2,
+  max_output_tokens: 200
+}')
 
-if __name__ == "__main__":
-    main()
+response=$(curl -s https://api.openai.com/v1/responses \
+    -H "Authorization: Bearer ${OPENAI_API_KEY_GIT}" \
+    -H "Content-Type: application/json" \
+    -d "$payload")
+
+# --- check for API error ------------------------------------------------------
+
+api_error=$(echo "$response" | jq -r '.error.message // empty')
+
+if [ -n "$api_error" ]; then
+  echo "OpenAI API error: $api_error" >&2
+  echo "Full response:" >&2
+  echo "$response" >&2
+  exit 1
+fi
+
+# --- extract commit message ---------------------------------------------------
+
+commit_message=$(echo "$response" | jq -r '
+  .output[0].content[0].text // empty
+')
+
+if [ -z "$commit_message" ] || [ "$commit_message" = "null" ]; then
+  echo "Error: model returned no commit message." >&2
+  echo "Full response:" >&2
+  echo "$response" >&2
+  exit 1
+fi
+
+# --- show message and ask for confirmation -----------------------------------
+
+echo
+echo "------------------------------------------------------------"
+echo "$commit_message"
+echo "------------------------------------------------------------"
+echo
+
+read -rp "Use this commit message? [y/N] " ans
+
+case "$ans" in
+  y|Y )
+    git commit -m "$commit_message"
+    ;;
+  * )
+    echo "Aborted."
+    exit 1
+    ;;
+esac
