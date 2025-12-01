@@ -21,6 +21,4 @@ pyright
 pytest
 rope
 rstfmt
-ruff
-uv
 virtualenv

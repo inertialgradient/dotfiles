@@ -62,6 +62,7 @@ setup_python() {
       --upgrade \
       pip \
       $(cat "${XDG_CONFIG_HOME}/mise/default-libraries-python" | tr '\n' ' ')
+  pip install --upgrade ruff uv
 }
 
 setup_emacs_plus() {
