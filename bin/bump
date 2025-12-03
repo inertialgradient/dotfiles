@@ -1,31 +1,40 @@
 #!/usr/bin/env bash
 
-set -x
+set -e
 
-# Update Dotfiles
-# ---------------------
-(cd ~/.dotfiles && git pull --rebase --autostash)
+# Ensure inside tmux
+if [ -z "$TMUX" ]; then
+  tmux new-session -d -s updates
+  tmux attach -t updates
+fi
 
-# Update Emacs config
-# ---------------------
-doom upgrade
-doom sync
+WINDOW="updates-$(date +%H:%M)"
+tmux new-window -n "$WINDOW"
 
-# Update Vim packages
-# ---------------------
-vim +PlugInstall +PlugUpgrade +PlugUpdate +qall
+# Capture the ID of the first pane
+PANE0=$(tmux display-message -p -t "$WINDOW" '#{pane_id}')
 
-# Update Homebrew packages
-# --------------------------
-export HOMEBREW_NO_INSTALL_CLEANUP=1
-brew update
-brew upgrade
-brew cleanup
+# Run dotfiles + vim in pane 0
+tmux send-keys -t "$PANE0" \
+  "cd ~/.dotfiles && git pull --rebase --autostash" C-m
+tmux send-keys -t "$PANE0" \
+  "vim +PlugInstall +PlugUpgrade +PlugUpdate +qall" C-m
 
-# Update Hosts file
-# --------------------------
-[[ "${1}" == "--update-hosts" ]] && update-hosts
+# Create pane 1
+PANE1=$(tmux split-window -h -t "$PANE0" \
+  -P -F '#{pane_id}' \
+  "doom upgrade && doom sync && bump-submodules")
 
-# Update Submodules
-# --------------------------
-bump-submodules
+# Create pane 2
+PANE2=$(tmux split-window -h -t "$PANE1" \
+  -P -F '#{pane_id}' \
+  "export HOMEBREW_NO_INSTALL_CLEANUP=1; brew update && brew upgrade && brew cleanup")
+
+tmux select-layout -t "$WINDOW" even-horizontal
+
+# Optional hosts update: always in pane 0
+if [[ "$1" == "--hosts" ]]; then
+  echo "Updating hosts file..."
+  sleep 3
+  tmux send-keys -t "$PANE0" "update-hosts" C-m
+fi
