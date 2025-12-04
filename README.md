@@ -9,7 +9,7 @@ Installation
 2. Clone this repo
 
    ```shell
-    git clone --recurse-submodules -j8 https://github.com/inertialgradient/dotfiles ~/.dotfiles
+    git clone --recurse-submodules -j8 https://github.com/damphessian/dotfiles ~/.dotfiles
    ```
 
 3. Run the bootstrap script
