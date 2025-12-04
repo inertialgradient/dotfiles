@@ -378,6 +378,7 @@ Use =s-`= to cycle between frames.
  "s-A"   #'do/org:agenda:view-dashboard
  "s-f"   #'avy-goto-char-2
  "s-k"   #'bury-buffer
+ "s-P"   #'execute-extended-command
  "s-q"   #'save-buffers-kill-terminal
  "s-s"   #'save-buffer
  "s-w"   #'+workspace/close-window-or-workspace)
