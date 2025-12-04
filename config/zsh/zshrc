@@ -382,7 +382,6 @@ bindkey "^z"    ctrlz            # Ctrl-Z toggle
 
 # String-Based (macros)
 bindkey -s "^h" "cd\n"           # CD with PD
-bindkey -s "^\]" "g cob\n"       # Git change branch
 
 # Emacs Mode
 bindkey -M emacs '^y' accept-and-hold
