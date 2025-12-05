@@ -31,7 +31,7 @@
 set -e
 
 TMUXINATOR_TEMPLATES_HOME="${TMUXINATOR_TEMPLATES_HOME:-$XDG_CONFIG_HOME/tmuxinator}"
-FZF="fzf --ansi --layout=reverse --preview-window=right:65%"
+FZF="fzf --ansi --layout=reverse --preview-window=right:80%"
 
 usage() {
     grep '^#' < "$0" | tail -n +2 | cut -c 3-
