@@ -13,7 +13,11 @@
   "minimap": {
     "show": "never"
   },
-  "icon_theme": "Zed (Default)",
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)"
+  },
   "vim_mode": true,
   "base_keymap": "Emacs",
   "ui_font_size": 16,
@@ -21,6 +25,6 @@
   "theme": {
     "mode": "dark",
     "light": "One Light",
-    "dark": "One Dark"
+    "dark": "Ayu Dark"
   }
 }
