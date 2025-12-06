@@ -180,7 +180,11 @@ git_branch() {
 
 gitstatus_prompt() {
   PROMPT=${SSH_CONNECTION:+$(color gray)%n@%m$(color reset)$'\n'}
-  PROMPT+="$(color blue)%c$(color reset) "
+  if [[ -z "${VIRTUAL_ENV}" ]]; then
+    PROMPT+="$(color blue)%c$(color reset) "
+  else
+    PROMPT+="$(color orange)%c$(color reset) "
+  fi
 
   if gitstatus_query MY && [[ ${VCS_STATUS_RESULT} == ok-sync ]]; then
     if (( VCS_STATUS_HAS_CONFLICTED )); then
@@ -206,6 +210,16 @@ gitstatus_prompt() {
 
   PROMPT+="$(color reset)%# "
   setopt no_prompt_{bang,subst} prompt_percent  # Enable/disable correct prompt expansions
+}
+
+git_prompt() {
+  # Fallback prompt without gitstatus
+  local prompt
+  prompt=${SSH_CONNECTION:+$(color gray)%n@%m$(color reset)$'\n'}
+  prompt+="$(color blue)%c$(color reset) "
+  prompt+='$(git_branch)'                    # Git branch/commit with color
+  prompt+='$(color reset)%# '                # Reset and prompt symbol
+  echo "${prompt}"
 }
 
 # 5. Zsh Options and Settings
@@ -417,6 +431,9 @@ bindkey -s '\eOB' '\e[B'
 
 # 10.1 Color Helper
 autoload -U colors && colors
+fg_no_bold[orange]=$'\e[38;5;208m'
+fg[orange]=$'\e[38;5;208m'
+
 color() {
   case $1 in
     red)    printf "%s" "%{${fg_no_bold[red]}%}" ;;
@@ -424,6 +441,7 @@ color() {
     green)  printf "%s" "%{${fg_no_bold[green]}%}" ;;
     violet) printf "%s" "%{${fg_no_bold[magenta]}%}" ;;
     blue)   printf "%s" "%{${fg_no_bold[blue]}%}" ;;
+    orange) printf "%s" "%{${fg_no_bold[orange]}%}" ;;
     white)  printf "%s" "%{${fg_no_bold[white]}%}" ;;
     gray)   printf "%s" "%{${fg_no_bold[gray]}%}" ;;
     reset)  printf "%s" "%{${reset_color}%}" ;;
@@ -439,11 +457,7 @@ if [[ -f "${HOMEBREW_PREFIX}/opt/gitstatus/gitstatus.plugin.zsh" ]]; then
   autoload -Uz add-zsh-hook
   add-zsh-hook precmd gitstatus_prompt
 else
-  # Fallback prompt without gitstatus
-  PS1=$'$(color blue)%c$(color reset) '  # Current directory basename
-  PS1+='$(git_branch)'                    # Git branch/commit with color
-  PS1+='$(color reset)%# '                # Reset and prompt symbol
-  export PS1
+  export PS1="$(git_prompt)"
 fi
 
 # 10.3 Terminal Title
