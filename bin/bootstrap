@@ -236,6 +236,12 @@ setup :writing_projects, default: false do
   setup(:conclave) { setup_writing(:conclave) }
 end
 
+if machine_is?(:apple)
+  configure :dock do
+    clear_dock
+  end
+end
+
 perform :cleanups do
   brew_cleanup
   brew_doctor

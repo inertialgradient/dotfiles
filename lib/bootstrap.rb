@@ -226,6 +226,12 @@ def disable_press_and_hold
   execho("defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false")
 end
 
+def clear_dock
+  execho("defaults write com.apple.dock persistent-apps -array")
+  execho("defaults write com.apple.dock persistent-others -array")
+  execho("killall Dock")
+end
+
 # Homebrew-related commands
 # -------------------------
 
