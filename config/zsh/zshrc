@@ -259,6 +259,7 @@ setopt SHARE_HISTORY          # Share history across sessions
 # - zsh-syntax-highlighting
 # - zsh-vim-mode (unless in emacs)
 # - kitty shell integration (if in kitty)
+# - iterm2 shell integration (if in iterm2)
 
 if [[ -d "${XDG_DATA_HOME}/zsh/zsh-autosuggestions" ]]; then
   source "${XDG_DATA_HOME}/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
@@ -285,6 +286,14 @@ if [[ -n "${KITTY_INSTALLATION_DIR}" ]]; then
     . "${KITTY_INSTALLATION_DIR}/shell-integration/zsh/kitty.zsh"
   else
     echo "Warning: kitty shell integration not found"
+  fi
+fi
+
+if [[ -n "${ITERM_SESSION_ID}" ]]; then
+  if [[ -f "${XDG_DATA_HOME}/iterm2/iterm2_shell_integration.zsh" ]]; then
+    . "${XDG_DATA_HOME}/iterm2/iterm2_shell_integration.zsh"
+  else
+    echo "Warning: iTerm2 shell integration not found"
   fi
 fi
 
