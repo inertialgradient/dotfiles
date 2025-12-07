@@ -7,11 +7,13 @@
 
 export MISE_DIR="${XDG_DATA_HOME}/mise"
 export MISE_JOBS="${MACHINE_CORES}"
-export MISE_RUBY_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/mise/default-libraries-ruby"
+
 export MISE_GO_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/mise/default-libraries-golang"
 export MISE_NODE_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/mise/default-libraries-nodejs"
 export MISE_PERL_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/mise/default-libraries-perl"
 export MISE_PYTHON_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/mise/default-libraries-python"
+export MISE_RUBY_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/mise/default-libraries-ruby"
+export MISE_RUST_DEFAULT_PACKAGES_FILE="${XDG_CONFIG_HOME}/mise/default-libraries-rust"
 
 # extra config options for installs
 export POSTGRES_EXTRA_CONFIGURE_OPTIONS="--with-uuid=e2fs --with-libxml"
