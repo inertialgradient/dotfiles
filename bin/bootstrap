@@ -20,6 +20,11 @@ end
 
 setup :core_cli_tools do
 
+  brew install :ffmpeg
+  brew install :nbdime
+  brew install :pixi
+  brew install :pymupdf
+  brew install :tlrc
   brew_install :binutils
   brew_install :coreutils
   brew_install :cpdf
@@ -140,6 +145,7 @@ if machine_is?(:apple)
   setup :mac_tools do
 
     brew_install :colima
+    brew_install :cursor
     brew_install :osxutils
     brew_install :pinentry_mac
     brew_install :reattach_to_user_namespace
@@ -150,6 +156,7 @@ if machine_is?(:apple)
     cask_install :lm_studio
     cask_install :marked_app
     cask_install :ollama_app
+    cask_install :tailscale
     cask_install :the_clock
     cask_install :visual_studio_code
     cask_install :zed
