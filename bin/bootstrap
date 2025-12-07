@@ -47,6 +47,7 @@ setup :core_cli_tools do
   brew_install :parallel
   brew_install :ripgrep
   brew_install :shfmt
+  brew_install :tlrc
   brew_install :watch
   brew_install :wdiff
   brew_install :wget
