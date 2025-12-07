@@ -289,7 +289,11 @@ if [[ -n "${KITTY_INSTALLATION_DIR}" ]]; then
   fi
 fi
 
-if [[ -n "${ITERM_SESSION_ID}" ]]; then
+if [[ -f "${XDG_LOCALS_DIR}/config/iterm2/hostname.sh" ]]; then
+  . "${XDG_LOCALS_DIR}/config/iterm2/hostname.sh"
+fi
+
+if [[ -n "${ITERM_PROFILE}" ]]; then
   if [[ -f "${XDG_DATA_HOME}/iterm2/iterm2_shell_integration.zsh" ]]; then
     . "${XDG_DATA_HOME}/iterm2/iterm2_shell_integration.zsh"
   else
