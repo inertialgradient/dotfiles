@@ -8,7 +8,6 @@ github.com/josharian/impl@latest
 github.com/mdempsky/gocode@latest
 github.com/nsf/gocode@latest
 github.com/rogpeppe/godef@latest
-github.com/spf13/cobra@latest
 github.com/stretchr/testify@latest
 github.com/x-motemen/gore/cmd/gore@latest
 github.com/zmb3/gogetdoc@latest
