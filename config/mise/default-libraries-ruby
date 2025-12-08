@@ -2,12 +2,9 @@ amazing_print
 andyw8-seeing_is_believing
 benchmark-ips
 bundler
-bundler-gtags
 colorize
 debug
 fastri
-gem-browse
-gem-ctags
 hirb
 interactive_editor
 jazz_fingers
@@ -17,6 +14,5 @@ rspec
 rubocop
 rubygems-bundler
 rufo
-solargraph
 specific_install
 spicy-proton
