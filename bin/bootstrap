@@ -5,9 +5,6 @@
 require_relative "../lib/bootstrap"
 
 ensure_xcode_is_set_up
-ensure_gpg_permissions_are_set_correctly
-ensure_locals_are_created
-disable_press_and_hold
 
 setup :xdg_base_directory_environment do
   install_launchagent "com.tensorconclave.xdg"
@@ -185,6 +182,7 @@ if machine_is?(:apple)
     cask_install :launchcontrol
     cask_install :launchpad_manager
     cask_install :licecap
+    cask_install :maestral
     cask_install :name_mangler
     cask_install :onedrive
     cask_install :pdfsam_basic
@@ -222,6 +220,10 @@ if machine_is?(:apple)
   end
 end
 
+ensure_dropbox_synced
+ensure_locals_are_created
+ensure_gpg_permissions_are_set_correctly
+
 setup :doom_config do
   script_install :doom
 end
@@ -237,7 +239,8 @@ setup :writing_projects, default: false do
 end
 
 if machine_is?(:apple)
-  configure :dock do
+  configure :macos do
+    disable_press_and_hold
     clear_dock
   end
 end

@@ -156,6 +156,11 @@ def command_exists?(command)
   system("command -v #{command} >/dev/null 2>&1")
 end
 
+def ensure_dropbox_synced
+  execho("mkdir ~/Dropbox")
+  prompt_and_wait "Issue `maestral gui` (macOS) or `maestral start` (Linux) and wait for sync to complete."
+end
+
 def ensure_gpg_permissions_are_set_correctly
   if File.exist?(ENVIRONMENT.fetch("GNUPGHOME"))
     system(ENVIRONMENT, "chmod 600 ${GNUPGHOME}/*")
@@ -217,7 +222,9 @@ def setup_emacs_plus(version: 30)
     brew_tap "d12frosted/emacs-plus"
     yield
     execho <<~SH
+      rm -rf '/Applications/Emacs.app' '/Applications/Emacs Client.app'
       osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@#{version}/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
+      osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@#{version}/Emacs Client.app" at posix file "/Applications" with properties {name:"Emacs Client.app"}'
     SH
   end
 end
