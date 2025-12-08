@@ -46,8 +46,8 @@ RED="\e[0;31m"
 RESET="\e[0m"
 YELLOW="\e[33m"
 
-TEMPLATE="${BOLDBLK}template${RESET}"
-SESSION="${BLUE}session${RESET}"
+TEMPLATE="${BOLDBLK}t${RESET}"
+SESSION="${BLUE}s${RESET}"
 
 running_tmux_sessions() {
     tmux list-sessions 2> /dev/null |\
@@ -80,11 +80,11 @@ tmux_dwim() {
     selections_list=""
     IFS=$'\n'
     for session in $sessions; do
-      selections_list="$selections_list\n$SESSION\t\t$session"
+      selections_list="$selections_list\n$SESSION $session"
     done
 
     for template in $templates; do
-      selections_list="$selections_list\n$TEMPLATE\t$template"
+      selections_list="$selections_list\n$TEMPLATE $template"
     done
     unset IFS
 
@@ -96,9 +96,9 @@ tmux_dwim() {
     kind="$(echo "${selection}" | awk '{ print $1 }')"
     name="$(echo "${selection}" | sed -E 's/^\w+\s+(.+)$/\1/')"
 
-    if [[ "$kind" == 'session' ]]; then
+    if [[ "$kind" == 's' ]]; then
         open_or_switch_to_session "$name"
-    elif [[ "$kind" == 'template' ]]; then
+    elif [[ "$kind" == 't' ]]; then
         echo tmuxinator start "$name"
         tmuxinator start "$name"
     else

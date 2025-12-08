@@ -19,7 +19,7 @@ vertical_line() {
     printf "${RESET}\n"
 }
 
-if [[ "$type" == "session" ]]; then
+if [[ "$type" == "s" ]]; then
     tmux list-windows \
          -t "$name" \
          -F "#{window_index}: #{window_name} (#{window_panes} panes)"
@@ -27,7 +27,7 @@ if [[ "$type" == "session" ]]; then
     tmux capture-pane -p -e -S0 -E- -J -t "$name"
 fi
 
-if [[ "$type" == "template" ]]; then
+if [[ "$type" == "t" ]]; then
     bat --color=always \
         "${TMUXINATOR_TEMPLATES_HOME}"/"${name}".{yml,yaml} 2>/dev/null
 fi
