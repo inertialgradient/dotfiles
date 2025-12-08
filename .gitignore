@@ -75,43 +75,35 @@ state
 # high-churn config files,
 # state files miscategorized as config
 
+/config/.gsd-keyboard.settings-ported
+/config/GNOME-xdg-terminals.list
+/config/NVIDIA/
 /config/Webull\ Desktop
+/config/autostart/
 /config/colima
 /config/configstore/update-notifier-gatsby-cli.json
 /config/configstore/update-notifier-npm.json
 /config/cups/
 /config/cursor/
+/config/dconf/
 /config/docker/*
 /config/doom/config.el
+/config/evolution/
 /config/exercism
 /config/gatsby/
 /config/github-copilot/versions.json
+/config/glib-2.0/
 /config/glow/
+/config/gnome-control-center/
+/config/gnome-initial-setup-done
 /config/go
+/config/gtk-3.0/
+/config/ibus-mozc-gnome-initial-setup-done
+/config/ibus/
 /config/irb/irb_history
 /config/iterm2/AppSupport
 /config/jupyter/migrated
 /config/karabiner/automatic_backups
-/config/rstudio
-/config/wireshark
-/config/zsh/.iterm2*
-/config/zsh/.zcompcache
-/config/zsh/.zcompdump
-/config/zsh/.zsh_history
-/config/zsh/.zsh_sessions
-
-/config/.gsd-keyboard.settings-ported
-/config/GNOME-xdg-terminals.list
-/config/NVIDIA/
-/config/autostart/
-/config/dconf/
-/config/evolution/
-/config/glib-2.0/
-/config/gnome-control-center/
-/config/gnome-initial-setup-done
-/config/gtk-3.0/
-/config/ibus-mozc-gnome-initial-setup-done
-/config/ibus/
 /config/maestral/
 /config/mimeapps.list
 /config/monitors.xml
@@ -122,6 +114,8 @@ state
 /config/pop-system-updater/
 /config/pulse/
 /config/qalculate/qalc.history
+/config/raycast/
+/config/rstudio
 /config/systemd/
 /config/tiling-assistant/
 /config/toshy/*
@@ -131,7 +125,13 @@ state
 /config/user-dirs.dirs
 /config/user-dirs.locale
 /config/vlc/
+/config/wireshark
 /config/zed/prompts/*
+/config/zsh/.iterm2*
+/config/zsh/.zcompcache
+/config/zsh/.zcompdump
+/config/zsh/.zsh_history
+/config/zsh/.zsh_sessions
 
 # symlinks to secure
 
