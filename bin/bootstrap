@@ -176,6 +176,7 @@ if machine_is?(:apple)
     cask_install :iterm2
     cask_install :itermai
     cask_install :keycastr
+    cask_install :kid3
     cask_install :kitty
     cask_install :latexit
     cask_install :launchbar
@@ -191,6 +192,7 @@ if machine_is?(:apple)
     cask_install :screenflow
     cask_install :shottr
     cask_install :skim
+    cask_install :subler
     cask_install :tex_live_utility
     cask_install :transmission
     cask_install :vlc
