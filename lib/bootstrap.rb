@@ -157,6 +157,8 @@ def command_exists?(command)
 end
 
 def ensure_dropbox_synced
+  return if File.exist?(File.expand_path "~/Dropbox")
+
   execho("mkdir ~/Dropbox")
   prompt_and_wait "Issue `maestral gui` (macOS) or `maestral start` (Linux) and wait for sync to complete."
 end
@@ -166,7 +168,7 @@ def ensure_gpg_permissions_are_set_correctly
     system(ENVIRONMENT, "chmod 600 ${GNUPGHOME}/*")
     system(ENVIRONMENT, "chmod 700 ${GNUPGHOME}/")
   else
-    puts "Error: Ensure Dropbox is installed and synced."
+    puts "Error: GNUPGHOME not found. Ensure Dropbox is installed and synced."
     exit 1
   end
 end

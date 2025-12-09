@@ -17,11 +17,6 @@ end
 
 setup :core_cli_tools do
 
-  brew install :ffmpeg
-  brew install :nbdime
-  brew install :pixi
-  brew install :pymupdf
-  brew install :tlrc
   brew_install :binutils
   brew_install :coreutils
   brew_install :cpdf
@@ -30,6 +25,7 @@ setup :core_cli_tools do
   brew_install :docker
   brew_install :docker_compose
   brew_install :fd
+  brew_install :ffmpeg
   brew_install :findutils
   brew_install :gawk
   brew_install :git
@@ -46,7 +42,10 @@ setup :core_cli_tools do
   brew_install :jq
   brew_install :less
   brew_install :maestral
+  brew_install :nbdime
   brew_install :parallel
+  brew_install :pixi
+  brew_install :pymupdf
   brew_install :ripgrep
   brew_install :shfmt
   brew_install :tlrc
@@ -143,12 +142,12 @@ if machine_is?(:apple)
   setup :mac_tools do
 
     brew_install :colima
-    brew_install :cursor
     brew_install :osxutils
     brew_install :pinentry_mac
     brew_install :reattach_to_user_namespace
     brew_install :trash
     brew_install :vim
+    cask_install :cursor
     cask_install :daisydisk
     cask_install :karabiner_elements
     cask_install :lm_studio
@@ -179,7 +178,6 @@ if machine_is?(:apple)
     cask_install :kid3
     cask_install :kitty
     cask_install :latexit
-    cask_install :launchbar
     cask_install :launchcontrol
     cask_install :launchpad_manager
     cask_install :licecap
@@ -187,6 +185,7 @@ if machine_is?(:apple)
     cask_install :name_mangler
     cask_install :onedrive
     cask_install :pdfsam_basic
+    cask_install :raycast
     cask_install :rectangle_pro
     cask_install :responsively
     cask_install :screenflow
