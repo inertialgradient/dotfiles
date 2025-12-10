@@ -1,4 +1,4 @@
-default_provider: lmstudio_gpt
+default_provider: lms_mistral7b
 
 providers:
   openai:
@@ -7,8 +7,20 @@ providers:
     api_key_env: "OPENAI_API_KEY_GIT"
     protocol: "responses"
 
-  lmstudio_gpt:
+  grok:
+    base_url: "https://api.x.ai/v1"
+    model: "grok-3-mini"
+    api_key_env: "XAI_API_KEY"
+    protocol: "responses"
+
+  lms_gpt:
     base_url: "http://jmr-studio.local:1234/v1"
     model: "openai/gpt-oss-20b"
+    api_key_env: "LMSTUDIO_API_KEY"
+    protocol: "chat"
+
+  lms_mistral7b:
+    base_url: "http://jmr-air.local:1234/v1"
+    model: "mlx-community/Mistral-7B-Instruct-v0.1-4bit-mlx"
     api_key_env: "LMSTUDIO_API_KEY"
     protocol: "chat"
