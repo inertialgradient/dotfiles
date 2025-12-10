@@ -154,7 +154,6 @@ if machine_is?(:apple)
     cask_install :marked_app
     cask_install :ollama_app
     cask_install :tailscale
-    cask_install :the_clock
     cask_install :visual_studio_code
     cask_install :zed
 
@@ -215,7 +214,6 @@ if machine_is?(:apple)
     cask_install :jupyter_notebook_viewer, options: :no_quarantine
     cask_install :qlvideo, options: :no_quarantine
     cask_install :suspicious_package, options: :no_quarantine
-    cask_install :syntax_highlight, options: :no_quarantine
 
     reset_quicklookd
   end
