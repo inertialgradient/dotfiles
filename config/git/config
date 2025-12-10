@@ -163,7 +163,7 @@
 	cm       = commit-quick
 	cmt      = commit-tagged
 	cmf      = commit-fixup
-	cmg      = commit-generator
+	cmg      = commit-generator --stream
 	cmm      = commit-quick-force
 	cms      = commit-squash
 	ca       = commit-amend
