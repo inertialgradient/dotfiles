@@ -1,4 +1,4 @@
-default_provider: lms_mistral7b
+default_provider: lms_deepseek
 
 providers:
   openai:
@@ -19,8 +19,8 @@ providers:
     api_key_env: "LMSTUDIO_API_KEY"
     protocol: "chat"
 
-  lms_mistral7b:
-    base_url: "http://jmr-air.local:1234/v1"
-    model: "mlx-community/Mistral-7B-Instruct-v0.1-4bit-mlx"
+  lms_deepseek:
+    base_url: "http://jmr-studio.local:1234/v1"
+    model: "deepseek-coder-v2-lite-instruct-mlx"
     api_key_env: "LMSTUDIO_API_KEY"
     protocol: "chat"
