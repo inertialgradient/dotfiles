@@ -1,5 +1,5 @@
 # shellcheck source=/dev/null
-source "${HOME}/.dotfiles/env/setup.sh"
+source "${DOTFILES_DIR}/env/setup.sh"
 
 # zsh config execution order
 # ----------------------------
@@ -22,3 +22,10 @@ if [ -x /usr/libexec/path_helper ]; then
   function noop () { }
   alias '/usr/libexec/path_helper'=noop
 fi
+
+# Source private or machine-specific configs last.
+[[ -f "${XDG_SECURE_DIR}/config/zsh/zshenv" ]] && \
+  source "${XDG_SECURE_DIR}/config/zsh/zshenv"
+
+[[ -f "${XDG_LOCALS_DIR}/locals/config/zsh/zshenv" ]] && \
+  source "${XDG_LOCALS_DIR}/locals/config/zsh/zshenv"
