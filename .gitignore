@@ -106,6 +106,7 @@ state
 /config/karabiner/automatic_backups
 /config/maestral/
 /config/mimeapps.list
+/config/mlflow/telemetry.json
 /config/monitors.xml
 /config/mozc/
 /config/nautilus/
