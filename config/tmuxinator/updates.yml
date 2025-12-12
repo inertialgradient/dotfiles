@@ -12,6 +12,6 @@ windows:
   - doom sync
   - bump-submodules
 - hosts:
-  - update-hosts
+  - hosts update
 - brew:
   - brew upgrade
