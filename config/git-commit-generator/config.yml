@@ -1,4 +1,4 @@
-default_provider: lms_deepseek
+default_provider: grok
 
 providers:
   openai:
