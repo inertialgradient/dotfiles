@@ -1,7 +1,6 @@
 debug: false
 skip_dirs:
   - ~/Applications
-  - ~/Cellar
   - ~/Documents
   - ~/Library
   - ~/Movies
