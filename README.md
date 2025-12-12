@@ -7,7 +7,11 @@ Installation
 1. Clone this repo
 
    ```shell
-    git clone --recurse-submodules -j8 https://github.com/damphessian/dotfiles ~/.dotfiles
+   git clone \
+       --recurse-submodules \
+       --jobs=$(( $(sysctl -n hw.ncpu) - 1 )) \
+       https://github.com/damphessian/dotfiles \
+       ~/.dotfiles
    ```
 
 2. Run the bootstrap script
